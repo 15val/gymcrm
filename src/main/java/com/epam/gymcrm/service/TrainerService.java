@@ -2,17 +2,24 @@ package com.epam.gymcrm.service;
 
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
+import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
 import com.epam.gymcrm.utils.HibernateUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,31 +29,23 @@ public class TrainerService {
 	private final UserService userService;
 
 
-	public Integer createTrainer(Trainer trainer) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
+	@Transactional
+	public Long createTrainer(Trainer trainer) {
 		try {
-			if(session.get(User.class, trainer.getUser1().getId()) == null){
+			if(userRepository.findById(trainer.getUser1().getId()).orElse(null) == null){
 				throw new UserNotFoundException("User was not found");
 			}
-			session.persist(trainer);
-			transaction.commit();
+			trainerRepository.save(trainer);
 			return trainer.getId();
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
-	public Integer updateTrainer(Trainer trainer) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
+
+	@Transactional
+	public Long updateTrainer(Trainer trainer) {
 		try {
 			Trainer updatedTrainer = Trainer.builder()
 					.id(trainer.getId())
@@ -55,25 +54,18 @@ public class TrainerService {
 					.traineeSet(trainer.getTraineeSet())
 					.trainingType2(trainer.getTrainingType2())
 					.build();
-			session.persist(updatedTrainer);
-			transaction.commit();
+			trainerRepository.save(updatedTrainer);
 			return updatedTrainer.getId();
 		} catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		} finally {
-			session.close();
 		}
 		return null;
 	}
 
-	public Trainer getTrainerById(Integer trainerId) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
-		Trainer trainer;
+	@Transactional
+	public Trainer getTrainerById(Long trainerId) {
 		try {
-			trainer = session.get(Trainer.class, trainerId);
+			Trainer trainer = trainerRepository.findById(trainerId).orElse(null);
 			if(trainer == null){
 				throw new UserNotFoundException("Trainer was not found");
 			}
@@ -82,37 +74,47 @@ public class TrainerService {
 			}
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
 
-	public Integer deleteTrainer(Integer trainerId) {
+	public void deleteTrainer(Long trainerId) {
 		throw new UnsupportedOperationException("Not allowed to delete trainer");
 	}
 
-	public void switchActive(Integer trainerId) {
-		User user = userService.getUserById(getTrainerById(trainerId).getUser1().getId());
-		user.setIsActive(!user.getIsActive());
-		userService.updateUser(user);
+	@Transactional
+	public void switchActive(Long trainerId) {
+		try {
+			User user = userService.getUserById(getTrainerById(trainerId).getUser1().getId());
+			user.setIsActive(!user.getIsActive());
+			userService.updateUser(user);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void changePassword(Integer trainerId, String newPassword){
-		User user = userService.getUserById(getTrainerById(trainerId).getUser1().getId());
-		user.setPassword(newPassword);
-		userService.updateUser(user);
-	}
-	public Trainer getTrainerByUsername(String username) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
-		Trainer trainer;
+	@Transactional
+	public void changePassword(Long trainerId, String newPassword){
 		try {
-			trainer = session.get(Trainer.class, userRepository.findByUsername(username).getTrainer().getId());
+			User user = userService.getUserById(getTrainerById(trainerId).getUser1().getId());
+			user.setPassword(newPassword);
+			userService.updateUser(user);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Transactional
+	public Trainer getTrainerByUsername(String username) {
+		try {
+			User user = userRepository.findByUsername(username);
+			if(user == null){
+				throw new UserNotFoundException("User was not found");
+			}
+			Trainer trainer = trainerRepository.findById(user.getTrainer().getId()).orElse(null);
 			if(trainer == null){
 				throw new UserNotFoundException("Trainer was not found");
 			}
@@ -121,12 +123,29 @@ public class TrainerService {
 			}
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
+
+	public Set<Training> getTrainingsByTrainerUsernameAndCriteria(String username, Date fromDate, Date toDate, String traineeUsername) throws UserNotFoundException {
+		try {
+			User user = userRepository.findByUsername(username);
+			if (user == null) {
+				throw new UserNotFoundException("Trainer was not found");
+			}
+			Set<Training> trainings = new HashSet<>(user.getTrainer().getTrainingSet());
+			trainings = trainings.stream()
+					.filter(training -> fromDate == null || training.getTrainingDate().after(fromDate))
+					.filter(training -> toDate == null || training.getTrainingDate().before(toDate))
+					.filter(training -> traineeUsername == null || training.getTrainee1().getUser().getUsername().equals(traineeUsername))
+					.collect(Collectors.toSet());
+			return trainings;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		throw new UserNotFoundException("Trainings matching criteria not found");
+	}
+
 }

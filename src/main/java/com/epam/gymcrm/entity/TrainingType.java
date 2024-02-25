@@ -27,7 +27,7 @@ public class TrainingType {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	@Column(name = "id")
-	private Integer id;
+	private Long id;
 
 	@Basic
 	@Column(name = "training_type_name")

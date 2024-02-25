@@ -6,7 +6,10 @@ import com.epam.gymcrm.entity.TrainingType;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.repository.TrainingRepository;
+import com.epam.gymcrm.repository.TrainingTypeRepository;
+import com.epam.gymcrm.repository.UserRepository;
 import com.epam.gymcrm.utils.HibernateUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -16,41 +19,32 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class TrainingService {
-	private TrainingRepository trainingRepository;
+	private final TrainingRepository trainingRepository;
+	private final TrainingTypeRepository trainingTypeRepository;
+	private final UserRepository userRepository;
 
-
-	public Integer createTraining(Training training) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
+	@Transactional
+	public Long createTraining(Training training) {
 		try {
-			if(session.get(User.class, training.getTrainee1().getUser().getId()) == null || session.get(User.class, training.getTrainer1().getUser1().getId()) == null){
+			if(userRepository.findById(training.getTrainee1().getUser().getId()).orElse(null) == null || userRepository.findById(training.getTrainer1().getUser1().getId()).orElse(null) == null){
 				throw new UserNotFoundException("User was not found");
 			}
-			else if(session.get(TrainingType.class, training.getTrainingType1().getId()) == null){
+			else if(trainingTypeRepository.findById(training.getTrainingType1().getId()).orElse(null) == null){
 				throw new UserNotFoundException("Training type was not found");
 			}
-			session.persist(training);
-			transaction.commit();
+			trainingRepository.save(training);
 			return training.getId();
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
 
-	public Training getTrainingById(Integer trainingId) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
-		Training training;
+	@Transactional
+	public Training getTrainingById(Long trainingId) {
 		try {
-			training = session.get(Training.class, trainingId);
+			Training training = trainingRepository.findById(trainingId).orElse(null);
 			if(training == null){
 				throw new UserNotFoundException("Training was not found");
 			}
@@ -59,16 +53,12 @@ public class TrainingService {
 			}
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
 
-	public Integer deleteTraining(Integer trainingId) {
+	public void deleteTraining(Long trainingId) {
 		throw new UnsupportedOperationException("Not allowed to delete training");
 	}
 	public Training updateTraining(Training training) {

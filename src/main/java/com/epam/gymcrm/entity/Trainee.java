@@ -32,7 +32,7 @@ public class Trainee {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	@Column(name = "id")
-	private Integer id;
+	private Long id;
 
 	@Basic
 	@Column(name = "date_of_birth")

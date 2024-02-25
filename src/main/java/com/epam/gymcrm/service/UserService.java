@@ -1,17 +1,11 @@
 package com.epam.gymcrm.service;
 
-import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.repository.UserRepository;
-import com.epam.gymcrm.utils.HibernateUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -21,31 +15,25 @@ public class UserService {
 
 	private final UserRepository userRepository;
 
-	public User getUserById(Integer userId) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
-		User user;
+	@Transactional
+	public User getUserById(Long userId) {
 		try {
-			user = session.get(User.class, userId);
+			User user = userRepository.findById(userId).orElse(null);
 			if(user == null){
-				throw new NullPointerException();
+				throw new UserNotFoundException("User was not found");
 			}
 			else {
 				return user;
 			}
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
 
-	public Integer createUser(String firstName, String lastName) {
+	@Transactional
+	public Long createUser(String firstName, String lastName) {
 		User user = User.builder()
 				.firstName(firstName)
 				.lastName(lastName)
@@ -53,28 +41,18 @@ public class UserService {
 				.password(generatePassword())
 				.isActive(true)
 				.build();
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
 		try {
-			session.persist(user);
-			transaction.commit();
+			userRepository.save(user);
 			return user.getId();
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
 
-	public Integer updateUser(User user) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
+	@Transactional
+	public Long updateUser(User user) {
 		try {
 			User updatedUser = User.builder()
 					.id(user.getId())
@@ -84,40 +62,27 @@ public class UserService {
 					.password(user.getPassword())
 					.isActive(user.getIsActive())
 					.build();
-			session.persist(updatedUser);
-			transaction.commit();
+			userRepository.save(updatedUser);
 			return updatedUser.getId();
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
 
-	public Integer deleteUser(Integer userId) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
-		User user;
+	@Transactional
+	public void deleteUser(Long userId) {
 		try {
-			user = session.get(User.class, userId);
+			User user = userRepository.findById(userId).orElse(null);
 			if (user == null) {
 				throw new UserNotFoundException("User was not found");
 			} else {
-				session.remove(user);
-				return user.getId();
+				userRepository.delete(user);
 			}
 		} catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		} finally {
-			session.close();
 		}
-		return null;
 	}
 
 	private String generateUsername(String firstName, String lastName) {
@@ -125,7 +90,6 @@ public class UserService {
 		String username = firstName + "." + lastName;
 		int serialNumber = 1;
 		String finalUsername = username;
-
 		while (usernameExists.test(finalUsername)) {
 			finalUsername = username + serialNumber;
 			serialNumber++;

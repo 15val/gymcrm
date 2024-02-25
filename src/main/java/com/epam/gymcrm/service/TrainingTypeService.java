@@ -5,6 +5,7 @@ import com.epam.gymcrm.entity.TrainingType;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.utils.HibernateUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -19,13 +20,10 @@ public class TrainingTypeService {
 
 
 
-	public TrainingType getTrainingTypeById(Integer trainingTypeId) {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.openSession();
-		Transaction transaction = session.beginTransaction();
-		TrainingType trainingType;
+	@Transactional
+	public TrainingType getTrainingTypeById(Long trainingTypeId) {
 		try {
-			trainingType = session.get(TrainingType.class, trainingTypeId);
+			TrainingType trainingType = trainingTypeRepository.findById(trainingTypeId).orElse(null);
 			if(trainingType == null){
 				throw new UserNotFoundException("Training type was not found");
 			}
@@ -34,11 +32,7 @@ public class TrainingTypeService {
 			}
 		}
 		catch (Exception e) {
-			transaction.rollback();
 			e.printStackTrace();
-		}
-		finally {
-			session.close();
 		}
 		return null;
 	}
