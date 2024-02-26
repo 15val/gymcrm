@@ -11,6 +11,7 @@ import com.epam.gymcrm.repository.UserRepository;
 import com.epam.gymcrm.utils.HibernateUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TrainerService {
 	private final TrainerRepository trainerRepository;
 	private final UserRepository userRepository;
@@ -39,7 +41,7 @@ public class TrainerService {
 			return trainer.getId();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while creating trainer: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -62,7 +64,7 @@ public class TrainerService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while updating trainer: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -82,7 +84,7 @@ public class TrainerService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving trainer: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -104,7 +106,7 @@ public class TrainerService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while switching active of trainer: {}", e.getMessage());
 		}
 	}
 
@@ -121,7 +123,7 @@ public class TrainerService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while changing password of trainer: {}", e.getMessage());
 		}
 	}
 
@@ -142,7 +144,7 @@ public class TrainerService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving trainer: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -164,7 +166,7 @@ public class TrainerService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving trainings by trainer username: {}", e.getMessage());
 		}
 		throw new UserNotFoundException("Trainings matching criteria not found");
 	}

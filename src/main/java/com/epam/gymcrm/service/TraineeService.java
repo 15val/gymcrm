@@ -11,6 +11,7 @@ import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TraineeService {
 	private final TraineeRepository traineeRepository;
 	private final UserRepository userRepository;
@@ -38,7 +40,7 @@ public class TraineeService {
 			traineeRepository.save(trainee);
 			return trainee.getId();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while creating trainee: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -62,7 +64,7 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while updating trainee: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -77,7 +79,7 @@ public class TraineeService {
 				traineeRepository.delete(trainee);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while deleting trainee: {}", e.getMessage());
 		}
 	}
 
@@ -92,7 +94,7 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving trainee: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -100,7 +102,7 @@ public class TraineeService {
 	@Transactional
 	public void switchActive(Long traineeId) {
 		try {
-			User user = userService.getUserById(getTraineeById(traineeId).getUser().getId());//query update user status jpql/native sql
+			User user = userService.getUserById(getTraineeById(traineeId).getUser().getId());
 			if(userService.isUsernameAndPasswordValid(user.getId())) {
 				user.setIsActive(!user.getIsActive());
 				userService.updateUser(user);
@@ -109,7 +111,7 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while switching active of trainee: {}", e.getMessage());
 		}
 	}
 
@@ -124,7 +126,7 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while changing password of trainee: {}", e.getMessage());
 		}
 	}
 
@@ -139,7 +141,7 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while updating trainers set of trainee: {}", e.getMessage());
 		}
 	}
 
@@ -153,7 +155,7 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving trainee: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -167,7 +169,7 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while deleting trainee: {}", e.getMessage());
 		}
 	}
 
@@ -188,7 +190,8 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving trainings by trainee username: {}", e.getMessage());
+
 		}
 		throw new UserNotFoundException("Trainings matching criteria not found");
 	}
@@ -207,7 +210,8 @@ public class TraineeService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving unassigned trainers by trainee username: {}", e.getMessage());
+
 		}
 		throw new UserNotFoundException("Unassigned trainers not found");
 

@@ -45,7 +45,7 @@ public class AppConfig {
 
 	@Bean
 	public TrainingService trainingService(){
-		return new TrainingService(trainingRepository, trainingTypeRepository, userRepository);
+		return new TrainingService(trainingRepository, trainingTypeRepository, userRepository, userService);
 	}
 
 	@Bean

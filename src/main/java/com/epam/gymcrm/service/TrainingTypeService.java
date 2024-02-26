@@ -7,6 +7,7 @@ import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.utils.HibernateUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -15,11 +16,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TrainingTypeService {
+
 	private final TrainingTypeRepository trainingTypeRepository;
-
-
-
 	@Transactional
 	public TrainingType getTrainingTypeById(Long trainingTypeId) {
 		try {
@@ -32,7 +32,7 @@ public class TrainingTypeService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving training type: {}", e.getMessage());
 		}
 		return null;
 	}

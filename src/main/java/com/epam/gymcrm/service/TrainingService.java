@@ -12,13 +12,17 @@ import com.epam.gymcrm.repository.UserRepository;
 import com.epam.gymcrm.utils.HibernateUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.core.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TrainingService {
 	private final TrainingRepository trainingRepository;
 	private final TrainingTypeRepository trainingTypeRepository;
@@ -42,7 +46,7 @@ public class TrainingService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while creating training: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -59,7 +63,7 @@ public class TrainingService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving training: {}", e.getMessage());
 		}
 		return null;
 	}

@@ -6,12 +6,14 @@ import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.Random;
 import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
 	private final UserRepository userRepository;
@@ -32,7 +34,7 @@ public class UserService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving user: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -51,7 +53,7 @@ public class UserService {
 			return user.getId();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while creating user: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -76,7 +78,7 @@ public class UserService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while updating user: {}", e.getMessage());
 		}
 		return null;
 	}
@@ -96,7 +98,7 @@ public class UserService {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while deleting user: {}", e.getMessage());
 		}
 	}
 
@@ -131,7 +133,7 @@ public class UserService {
 				return true;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while retrieving user during validation: {}", e.getMessage());
 		}
 		return false;
 	}
