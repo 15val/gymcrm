@@ -53,8 +53,8 @@ public class Trainee {
 			joinColumns = { @JoinColumn(name = "trainee_id") },
 			inverseJoinColumns = { @JoinColumn(name = "trainer_id") }
 	)
-	private Set<Trainer> trainerSet = new HashSet<>();
+	private Set<Trainer> trainerSet;
 
-	@OneToMany(mappedBy="trainee1")
+	@OneToMany(mappedBy="trainee1", cascade = { CascadeType.ALL })
 	private Set<Training> trainingSet;
 }

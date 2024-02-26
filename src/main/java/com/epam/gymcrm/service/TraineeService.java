@@ -76,6 +76,12 @@ public class TraineeService {
 			if (trainee == null) {
 				throw new UserNotFoundException("Trainee was not found");
 			} else {
+				Set<Training> trainings = trainee.getTrainingSet();
+				if (trainings != null) {
+					for (Training training : trainings) {
+						training.setTrainee1(null);
+					}
+				}
 				traineeRepository.delete(trainee);
 			}
 		} catch (Exception e) {
