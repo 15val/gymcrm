@@ -33,12 +33,10 @@ public class Trainer {
 	@Column(name = "id")
 	private Long id;
 
-	@Basic
 	@ManyToOne
 	@JoinColumn(name="specialization", referencedColumnName = "id")
 	private TrainingType trainingType2;
 
-	@Basic
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user1;

@@ -30,7 +30,7 @@ public class TrainingService {
 	private final UserService userService;
 
 	@Transactional
-	public Long createTraining(Training training) {
+	public Long createTraining(Training training) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			if(userService.isUsernameAndPasswordValid(training.getTrainee1().getUser().getId()) && userService.isUsernameAndPasswordValid(training.getTrainer1().getUser1().getId())) {
 				if (userRepository.findById(training.getTrainee1().getUser().getId()).orElse(null) == null || userRepository.findById(training.getTrainer1().getUser1().getId()).orElse(null) == null) {
@@ -47,12 +47,12 @@ public class TrainingService {
 		}
 		catch (Exception e) {
 			log.error("Error while creating training: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
-	public Training getTrainingById(Long trainingId) {
+	public Training getTrainingById(Long trainingId) throws UserNotFoundException {
 		try {
 			Training training = trainingRepository.findById(trainingId).orElse(null);
 			if(training == null){
@@ -64,8 +64,8 @@ public class TrainingService {
 		}
 		catch (Exception e) {
 			log.error("Error while retrieving training: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	public void deleteTraining(Long trainingId) {

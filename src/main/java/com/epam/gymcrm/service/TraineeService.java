@@ -124,8 +124,9 @@ public class TraineeService {
 	@Transactional
 	public void changePassword(Long traineeId, String newPassword) {
 		try {
-			User user = userService.getUserById(getTraineeById(traineeId).getUser().getId());
-			if (userService.isUsernameAndPasswordValid(user.getId())) {
+			Trainee trainee = getTraineeById(traineeId);
+			if (trainee != null && userService.isUsernameAndPasswordValid(trainee.getUser().getId())) {
+				User user = userService.getUserById(trainee.getUser().getId());
 				user.setPassword(newPassword);
 				userService.updateUser(user);
 			} else {

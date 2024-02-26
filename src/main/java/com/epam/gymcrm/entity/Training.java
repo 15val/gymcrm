@@ -28,30 +28,24 @@ public class Training {
 	@Column(name = "id")
 	private Long id;
 
-	@Basic
 	@ManyToOne
 	@JoinColumn(name="trainee_id", referencedColumnName = "id")
 	private Trainee trainee1;
 
-	@Basic
 	@ManyToOne
 	@JoinColumn(name="trainer_id", referencedColumnName = "id")
 	private Trainer trainer1;
 
-	@Basic
 	@Column(name = "training_name")
 	private String  trainingName;
 
-	@Basic
 	@ManyToOne
 	@JoinColumn(name="training_type_id", referencedColumnName = "id")
 	private TrainingType trainingType1;
 
-	@Basic
 	@Column(name = "training_date")
 	private Date trainingDate;
 
-	@Basic
 	@Column(name = "training_duration")
 	private Integer trainingDuration;
 

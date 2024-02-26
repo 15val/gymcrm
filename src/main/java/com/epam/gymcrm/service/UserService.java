@@ -50,7 +50,7 @@ public class UserService {
 				.build();
 		try {
 			userRepository.save(user);
-			return user.getId();
+			return userRepository.findByUsername(user.getUsername()).getId();
 		}
 		catch (Exception e) {
 			log.error("Error while creating user: {}", e.getMessage());
@@ -102,7 +102,7 @@ public class UserService {
 		}
 	}
 
-	private String generateUsername(String firstName, String lastName) {
+	public String generateUsername(String firstName, String lastName) {
 		Predicate<String> usernameExists = userRepository::existsByUsername;
 		String username = firstName + "." + lastName;
 		int serialNumber = 1;
@@ -114,7 +114,7 @@ public class UserService {
 		return finalUsername;
 	}
 
-	private String generatePassword() {
+	public String generatePassword() {
 		String symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		Random random = new Random();
 		StringBuilder password = new StringBuilder();

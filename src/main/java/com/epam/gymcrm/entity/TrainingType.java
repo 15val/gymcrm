@@ -29,7 +29,6 @@ public class TrainingType {
 	@Column(name = "id")
 	private Long id;
 
-	@Basic
 	@Column(name = "training_type_name")
 	private String trainingTypeName;
 

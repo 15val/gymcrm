@@ -34,15 +34,12 @@ public class Trainee {
 	@Column(name = "id")
 	private Long id;
 
-	@Basic
 	@Column(name = "date_of_birth")
 	private Date dateOfBirth;
 
-	@Basic
 	@Column(name = "address")
 	private String  address;
 
-	@Basic
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;

@@ -70,7 +70,7 @@ public class TrainerService {
 	}
 
 	@Transactional
-	public Trainer getTrainerById(Long trainerId) {
+	public Trainer getTrainerById(Long trainerId) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			Trainer trainer = trainerRepository.findById(trainerId).orElse(null);
 			if (trainer == null) {
@@ -85,8 +85,8 @@ public class TrainerService {
 		}
 		catch (Exception e) {
 			log.error("Error while retrieving trainer: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	public void deleteTrainer(Long trainerId) {
