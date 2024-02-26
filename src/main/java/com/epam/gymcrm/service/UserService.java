@@ -2,6 +2,7 @@ package com.epam.gymcrm.service;
 
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
+import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,16 @@ public class UserService {
 	@Transactional
 	public User getUserById(Long userId) {
 		try {
-			User user = userRepository.findById(userId).orElse(null);
-			if(user == null){
-				throw new UserNotFoundException("User was not found");
+			if(isUsernameAndPasswordValid(userId)) {
+				User user = userRepository.findById(userId).orElse(null);
+				if (user == null) {
+					throw new UserNotFoundException("User was not found");
+				} else {
+					return user;
+				}
 			}
 			else {
-				return user;
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		}
 		catch (Exception e) {
@@ -54,16 +59,21 @@ public class UserService {
 	@Transactional
 	public Long updateUser(User user) {
 		try {
-			User updatedUser = User.builder()
-					.id(user.getId())
-					.firstName(user.getFirstName())
-					.lastName(user.getLastName())
-					.username(user.getUsername())
-					.password(user.getPassword())
-					.isActive(user.getIsActive())
-					.build();
-			userRepository.save(updatedUser);
-			return updatedUser.getId();
+			if(isUsernameAndPasswordValid(user.getId())) {
+				User updatedUser = User.builder()
+						.id(user.getId())
+						.firstName(user.getFirstName())
+						.lastName(user.getLastName())
+						.username(user.getUsername())
+						.password(user.getPassword())
+						.isActive(user.getIsActive())
+						.build();
+				userRepository.save(updatedUser);
+				return updatedUser.getId();
+			}
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -74,11 +84,16 @@ public class UserService {
 	@Transactional
 	public void deleteUser(Long userId) {
 		try {
-			User user = userRepository.findById(userId).orElse(null);
-			if (user == null) {
-				throw new UserNotFoundException("User was not found");
-			} else {
-				userRepository.delete(user);
+			if(isUsernameAndPasswordValid(userId)) {
+				User user = userRepository.findById(userId).orElse(null);
+				if (user == null) {
+					throw new UserNotFoundException("User was not found");
+				} else {
+					userRepository.delete(user);
+				}
+			}
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -108,4 +123,16 @@ public class UserService {
 		return password.toString();
 	}
 
+	@Transactional
+	public boolean isUsernameAndPasswordValid(Long userId){
+		try{
+			User user = userRepository.findById(userId).orElse(null);
+			if(user != null && user.getUsername() != null && user.getPassword() != null) {
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 }

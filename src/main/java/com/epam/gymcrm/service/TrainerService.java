@@ -5,6 +5,7 @@ import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
+import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
 import com.epam.gymcrm.utils.HibernateUtil;
@@ -28,7 +29,6 @@ public class TrainerService {
 	private final UserRepository userRepository;
 	private final UserService userService;
 
-
 	@Transactional
 	public Long createTrainer(Trainer trainer) {
 		try {
@@ -47,15 +47,20 @@ public class TrainerService {
 	@Transactional
 	public Long updateTrainer(Trainer trainer) {
 		try {
-			Trainer updatedTrainer = Trainer.builder()
-					.id(trainer.getId())
-					.user1(trainer.getUser1())
-					.trainingSet(trainer.getTrainingSet())
-					.traineeSet(trainer.getTraineeSet())
-					.trainingType2(trainer.getTrainingType2())
-					.build();
-			trainerRepository.save(updatedTrainer);
-			return updatedTrainer.getId();
+			if(userService.isUsernameAndPasswordValid(trainer.getId())) {
+				Trainer updatedTrainer = Trainer.builder()
+						.id(trainer.getId())
+						.user1(trainer.getUser1())
+						.trainingSet(trainer.getTrainingSet())
+						.traineeSet(trainer.getTraineeSet())
+						.trainingType2(trainer.getTrainingType2())
+						.build();
+				trainerRepository.save(updatedTrainer);
+				return updatedTrainer.getId();
+			}
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -66,11 +71,14 @@ public class TrainerService {
 	public Trainer getTrainerById(Long trainerId) {
 		try {
 			Trainer trainer = trainerRepository.findById(trainerId).orElse(null);
-			if(trainer == null){
+			if (trainer == null) {
 				throw new UserNotFoundException("Trainer was not found");
 			}
+			else if(userService.isUsernameAndPasswordValid(trainer.getUser1().getId())) {
+					return trainer;
+			}
 			else {
-				return trainer;
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		}
 		catch (Exception e) {
@@ -87,8 +95,13 @@ public class TrainerService {
 	public void switchActive(Long trainerId) {
 		try {
 			User user = userService.getUserById(getTrainerById(trainerId).getUser1().getId());
-			user.setIsActive(!user.getIsActive());
-			userService.updateUser(user);
+			if(userService.isUsernameAndPasswordValid(user.getId())) {
+				user.setIsActive(!user.getIsActive());
+				userService.updateUser(user);
+			}
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -99,8 +112,13 @@ public class TrainerService {
 	public void changePassword(Long trainerId, String newPassword){
 		try {
 			User user = userService.getUserById(getTrainerById(trainerId).getUser1().getId());
-			user.setPassword(newPassword);
-			userService.updateUser(user);
+			if(userService.isUsernameAndPasswordValid(user.getId())) {
+				user.setPassword(newPassword);
+				userService.updateUser(user);
+			}
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -111,15 +129,16 @@ public class TrainerService {
 	public Trainer getTrainerByUsername(String username) {
 		try {
 			User user = userRepository.findByUsername(username);
-			if(user == null){
-				throw new UserNotFoundException("User was not found");
-			}
-			Trainer trainer = trainerRepository.findById(user.getTrainer().getId()).orElse(null);
-			if(trainer == null){
-				throw new UserNotFoundException("Trainer was not found");
+			if(userService.isUsernameAndPasswordValid(user.getId())) {
+				Trainer trainer = trainerRepository.findById(user.getTrainer().getId()).orElse(null);
+				if (trainer == null) {
+					throw new UserNotFoundException("Trainer was not found");
+				} else {
+					return trainer;
+				}
 			}
 			else {
-				return trainer;
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		}
 		catch (Exception e) {
@@ -131,16 +150,18 @@ public class TrainerService {
 	public Set<Training> getTrainingsByTrainerUsernameAndCriteria(String username, Date fromDate, Date toDate, String traineeUsername) throws UserNotFoundException {
 		try {
 			User user = userRepository.findByUsername(username);
-			if (user == null) {
-				throw new UserNotFoundException("Trainer was not found");
+			if(userService.isUsernameAndPasswordValid(user.getId())) {
+				Set<Training> trainings = new HashSet<>(user.getTrainer().getTrainingSet());
+				trainings = trainings.stream()
+						.filter(training -> fromDate == null || training.getTrainingDate().after(fromDate))
+						.filter(training -> toDate == null || training.getTrainingDate().before(toDate))
+						.filter(training -> traineeUsername == null || training.getTrainee1().getUser().getUsername().equals(traineeUsername))
+						.collect(Collectors.toSet());
+				return trainings;
 			}
-			Set<Training> trainings = new HashSet<>(user.getTrainer().getTrainingSet());
-			trainings = trainings.stream()
-					.filter(training -> fromDate == null || training.getTrainingDate().after(fromDate))
-					.filter(training -> toDate == null || training.getTrainingDate().before(toDate))
-					.filter(training -> traineeUsername == null || training.getTrainee1().getUser().getUsername().equals(traineeUsername))
-					.collect(Collectors.toSet());
-			return trainings;
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

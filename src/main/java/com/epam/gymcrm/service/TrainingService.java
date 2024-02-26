@@ -5,6 +5,7 @@ import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.TrainingType;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
+import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
@@ -22,18 +23,23 @@ public class TrainingService {
 	private final TrainingRepository trainingRepository;
 	private final TrainingTypeRepository trainingTypeRepository;
 	private final UserRepository userRepository;
+	private final UserService userService;
 
 	@Transactional
 	public Long createTraining(Training training) {
 		try {
-			if(userRepository.findById(training.getTrainee1().getUser().getId()).orElse(null) == null || userRepository.findById(training.getTrainer1().getUser1().getId()).orElse(null) == null){
-				throw new UserNotFoundException("User was not found");
+			if(userService.isUsernameAndPasswordValid(training.getTrainee1().getUser().getId()) && userService.isUsernameAndPasswordValid(training.getTrainer1().getUser1().getId())) {
+				if (userRepository.findById(training.getTrainee1().getUser().getId()).orElse(null) == null || userRepository.findById(training.getTrainer1().getUser1().getId()).orElse(null) == null) {
+					throw new UserNotFoundException("User was not found");
+				} else if (trainingTypeRepository.findById(training.getTrainingType1().getId()).orElse(null) == null) {
+					throw new UserNotFoundException("Training type was not found");
+				}
+				trainingRepository.save(training);
+				return training.getId();
 			}
-			else if(trainingTypeRepository.findById(training.getTrainingType1().getId()).orElse(null) == null){
-				throw new UserNotFoundException("Training type was not found");
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
-			trainingRepository.save(training);
-			return training.getId();
 		}
 		catch (Exception e) {
 			e.printStackTrace();

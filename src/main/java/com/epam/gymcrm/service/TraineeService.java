@@ -5,6 +5,7 @@ import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
+import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TraineeRepository;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
@@ -45,16 +46,21 @@ public class TraineeService {
 	@Transactional
 	public Long updateTrainee(Trainee trainee) {
 		try {
-			Trainee updatedTrainee = Trainee.builder()
-					.id(trainee.getId())
-					.address(trainee.getAddress())
-					.dateOfBirth(trainee.getDateOfBirth())
-					.trainerSet(trainee.getTrainerSet())
-					.trainingSet(trainee.getTrainingSet())
-					.user(trainee.getUser())
-					.build();
-			traineeRepository.save(updatedTrainee);
-			return updatedTrainee.getId();
+			if(userService.isUsernameAndPasswordValid(trainee.getUser().getId())){
+				Trainee updatedTrainee = Trainee.builder()
+						.id(trainee.getId())
+						.address(trainee.getAddress())
+						.dateOfBirth(trainee.getDateOfBirth())
+						.trainerSet(trainee.getTrainerSet())
+						.trainingSet(trainee.getTrainingSet())
+						.user(trainee.getUser())
+						.build();
+				traineeRepository.save(updatedTrainee);
+				return updatedTrainee.getId();
+			}
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -79,10 +85,11 @@ public class TraineeService {
 	public Trainee getTraineeById(Long traineeId) {
 		try {
 			Trainee trainee = traineeRepository.findById(traineeId).orElse(null);
-			if (trainee == null) {
-				throw new UserNotFoundException("Trainee was not found");
-			} else {
+			if(trainee != null && userService.isUsernameAndPasswordValid(trainee.getUser().getId())) {
 				return trainee;
+			}
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,37 +98,47 @@ public class TraineeService {
 	}
 
 	@Transactional
-	public void switchActive(Long traineeId){
+	public void switchActive(Long traineeId) {
 		try {
 			User user = userService.getUserById(getTraineeById(traineeId).getUser().getId());//query update user status jpql/native sql
-			user.setIsActive(!user.getIsActive());
-			userService.updateUser(user);
-		}
-		catch (Exception e) {
+			if(userService.isUsernameAndPasswordValid(user.getId())) {
+				user.setIsActive(!user.getIsActive());
+				userService.updateUser(user);
+			}
+			else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Transactional
-	public void changePassword(Long traineeId, String newPassword){
+	public void changePassword(Long traineeId, String newPassword) {
 		try {
 			User user = userService.getUserById(getTraineeById(traineeId).getUser().getId());
-			user.setPassword(newPassword);
-			userService.updateUser(user);
-		}
-		catch (Exception e) {
+			if (userService.isUsernameAndPasswordValid(user.getId())) {
+				user.setPassword(newPassword);
+				userService.updateUser(user);
+			} else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Transactional
-	public void updateTrainersSet(Long traineeId, Set<Trainer> trainerSet){
+	public void updateTrainersSet(Long traineeId, Set<Trainer> trainerSet) {
 		try {
 			Trainee trainee = getTraineeById(traineeId);
-			trainee.setTrainerSet(trainerSet);
-			traineeRepository.save(trainee);
-		}
-		catch (Exception e) {
+			if (userService.isUsernameAndPasswordValid(trainee.getUser().getId())) {
+				trainee.setTrainerSet(trainerSet);
+				traineeRepository.save(trainee);
+			} else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -130,25 +147,26 @@ public class TraineeService {
 	public Trainee getTraineeByUsername(String username) {
 		try {
 			Trainee trainee = traineeRepository.findById(userRepository.findByUsername(username).getTrainee().getId()).orElse(null);
-			if(trainee == null){
-				throw new UserNotFoundException("Trainee was not found");
-			}
-			else {
+			if (trainee != null && userService.isUsernameAndPasswordValid(trainee.getUser().getId())) {
 				return trainee;
+			} else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	@Transactional
-	public void deleteTraineeByUsername(String username){
+	public void deleteTraineeByUsername(String username) {
 		try {
-			deleteTrainee(getTraineeByUsername(username).getId());
-		}
-		catch (Exception e) {
+			if (userService.isUsernameAndPasswordValid(getTraineeByUsername(username).getUser().getId())) {
+				deleteTrainee(getTraineeByUsername(username).getId());
+			} else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -157,19 +175,19 @@ public class TraineeService {
 	public Set<Training> getTrainingsByTraineeUsernameAndCriteria(String username, Date fromDate, Date toDate, String trainerUsername, String trainingTypeName) throws UserNotFoundException {
 		try {
 			User user = userRepository.findByUsername(username);
-			if (user == null) {
-				throw new UserNotFoundException("Trainee was not found");
+			if (userService.isUsernameAndPasswordValid(user.getId())) {
+				Set<Training> trainings = new HashSet<>(user.getTrainee().getTrainingSet());
+				trainings = trainings.stream()
+						.filter(training -> fromDate == null || training.getTrainingDate().after(fromDate))
+						.filter(training -> toDate == null || training.getTrainingDate().before(toDate))
+						.filter(training -> trainerUsername == null || training.getTrainer1().getUser1().getUsername().equals(trainerUsername))
+						.filter(training -> trainingTypeName == null || training.getTrainingType1().getTrainingTypeName().equals(trainingTypeName))
+						.collect(Collectors.toSet());
+				return trainings;
+			} else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
-			Set<Training> trainings = new HashSet<>(user.getTrainee().getTrainingSet());
-			trainings = trainings.stream()
-					.filter(training -> fromDate == null || training.getTrainingDate().after(fromDate))
-					.filter(training -> toDate == null || training.getTrainingDate().before(toDate))
-					.filter(training -> trainerUsername == null || training.getTrainer1().getUser1().getUsername().equals(trainerUsername))
-					.filter(training -> trainingTypeName == null || training.getTrainingType1().getTrainingTypeName().equals(trainingTypeName))
-					.collect(Collectors.toSet());
-			return trainings;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		throw new UserNotFoundException("Trainings matching criteria not found");
@@ -178,18 +196,17 @@ public class TraineeService {
 	public List<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername) throws UserNotFoundException {
 		try {
 			User user = userRepository.findByUsername(traineeUsername);
-			if (user == null) {
-				throw new UserNotFoundException("Trainee was not found");
+			if (userService.isUsernameAndPasswordValid(user.getId())) {
+				List<Trainer> allTrainers = trainerRepository.findAll();
+				//trainers who assigned to this trainee
+				Set<Trainer> assignedTrainers = user.getTrainee().getTrainerSet();
+				// remove all assigned trainers
+				allTrainers.removeAll(assignedTrainers);
+				return new ArrayList<>(allTrainers);
+			} else {
+				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
-			List<Trainer> allTrainers = trainerRepository.findAll();
-			//trainers who assigned to this trainee
-			Set<Trainer> assignedTrainers = user.getTrainee().getTrainerSet();
-			// remove all assigned trainers
-			allTrainers.removeAll(assignedTrainers);
-
-			return new ArrayList<>(allTrainers);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		throw new UserNotFoundException("Unassigned trainers not found");
