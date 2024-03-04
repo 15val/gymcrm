@@ -49,16 +49,8 @@ public class TraineeService {
 	public Long updateTrainee(Trainee trainee) {
 		try {
 			if(userService.isUsernameAndPasswordValid(trainee.getUser().getId())){
-				Trainee updatedTrainee = Trainee.builder()
-						.id(trainee.getId())
-						.address(trainee.getAddress())
-						.dateOfBirth(trainee.getDateOfBirth())
-						.trainerSet(trainee.getTrainerSet())
-						.trainingSet(trainee.getTrainingSet())
-						.user(trainee.getUser())
-						.build();
-				traineeRepository.save(updatedTrainee);
-				return updatedTrainee.getId();
+				traineeRepository.save(trainee);
+				return trainee.getId();
 			}
 			else {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");

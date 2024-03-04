@@ -59,10 +59,4 @@ public class TrainingService {
 		}
 	}
 
-	public void deleteTraining(Long trainingId) {
-		throw new UnsupportedOperationException("Not allowed to delete training");
-	}
-	public Training updateTraining(Training training) {
-		throw new UnsupportedOperationException("Not allowed to update training");
-	}
 }

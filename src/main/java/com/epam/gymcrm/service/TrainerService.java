@@ -43,16 +43,9 @@ public class TrainerService {
 	@Transactional
 	public Long updateTrainer(Trainer trainer) {
 		try {
-			if(userService.isUsernameAndPasswordValid(trainer.getId())) {
-				Trainer updatedTrainer = Trainer.builder()
-						.id(trainer.getId())
-						.user1(trainer.getUser1())
-						.trainingSet(trainer.getTrainingSet())
-						.traineeSet(trainer.getTraineeSet())
-						.trainingType2(trainer.getTrainingType2())
-						.build();
-				trainerRepository.save(updatedTrainer);
-				return updatedTrainer.getId();
+			if(userService.isUsernameAndPasswordValid(trainer.getUser1().getId())) {
+				trainerRepository.save(trainer);
+				return trainer.getId();
 			}
 			else {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
@@ -82,11 +75,7 @@ public class TrainerService {
 			throw e;
 		}
 	}
-
-	public void deleteTrainer(Long trainerId) {
-		throw new UnsupportedOperationException("Not allowed to delete trainer");
-	}
-
+	
 	@Transactional
 	public void switchActive(Long trainerId) {
 		try {

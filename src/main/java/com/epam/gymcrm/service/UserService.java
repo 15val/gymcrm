@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -62,16 +64,12 @@ public class UserService {
 	public Long updateUser(User user) {
 		try {
 			if(isUsernameAndPasswordValid(user.getId())) {
-				User updatedUser = User.builder()
-						.id(user.getId())
-						.firstName(user.getFirstName())
-						.lastName(user.getLastName())
-						.username(user.getUsername())
-						.password(user.getPassword())
-						.isActive(user.getIsActive())
-						.build();
-				userRepository.save(updatedUser);
-				return updatedUser.getId();
+				User existingUser = userRepository.findById(user.getId()).orElse(null);
+				if(existingUser != null && !Objects.equals(user.getUsername(), existingUser.getUsername())){
+					throw new UnsupportedOperationException("Username cannot be changed");
+				}
+				userRepository.save(user);
+				return user.getId();
 			}
 			else {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
