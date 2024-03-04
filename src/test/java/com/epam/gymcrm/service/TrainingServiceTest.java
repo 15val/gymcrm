@@ -6,7 +6,6 @@ import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.TrainingType;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
-import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
@@ -25,8 +24,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)

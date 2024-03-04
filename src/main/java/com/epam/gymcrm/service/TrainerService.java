@@ -1,6 +1,5 @@
 package com.epam.gymcrm.service;
 
-import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.User;
@@ -8,14 +7,9 @@ import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
-import com.epam.gymcrm.utils.HibernateUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;

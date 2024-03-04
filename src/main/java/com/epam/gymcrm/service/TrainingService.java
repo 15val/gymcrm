@@ -1,23 +1,14 @@
 package com.epam.gymcrm.service;
 
-import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
-import com.epam.gymcrm.entity.TrainingType;
-import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
-import com.epam.gymcrm.utils.HibernateUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.core.Logger;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service

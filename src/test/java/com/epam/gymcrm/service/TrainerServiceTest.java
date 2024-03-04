@@ -3,7 +3,6 @@ package com.epam.gymcrm.service;
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
-import com.epam.gymcrm.entity.TrainingType;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
@@ -19,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.sql.Date;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
