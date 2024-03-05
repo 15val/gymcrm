@@ -7,23 +7,27 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "training", schema = "gymcrm_shema", catalog = "gymcrm")
 public class Training {
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
 	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "training_seq")
+	@SequenceGenerator(name = "training_seq", sequenceName = "training_seq", allocationSize = 1)
+	@Id
 	private Long id;
 
 	@ManyToOne

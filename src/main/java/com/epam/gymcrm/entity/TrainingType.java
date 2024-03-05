@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,9 +22,10 @@ import java.util.Set;
 @Table(name = "training_type", schema = "gymcrm_shema", catalog = "gymcrm")
 public class TrainingType {
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
 	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "training_type_seq")
+	@SequenceGenerator(name = "training_type_seq", sequenceName = "training_type_seq", allocationSize = 1)
+	@Id
 	private Long id;
 
 	@Column(name = "training_type_name")

@@ -9,7 +9,9 @@ import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TraineeRepository;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,14 +27,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class TraineeService {
+
+	@Autowired
 	private final TraineeRepository traineeRepository;
+	@Autowired
 	private final UserRepository userRepository;
+	@Autowired
 	private final UserService userService;
+	@Autowired
 	private final TrainerRepository trainerRepository;
 
 
-	@Transactional
-	public Long createTrainee(Trainee trainee) {
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Long createTrainee(Trainee trainee) throws UserNotFoundException {
 		try {
 			if (userRepository.findById(trainee.getUser().getId()).orElse(null) == null) {
 				throw new UserNotFoundException("User was not found");
@@ -41,8 +48,8 @@ public class TraineeService {
 			return trainee.getId();
 		} catch (Exception e) {
 			log.error("Error while creating trainee: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional

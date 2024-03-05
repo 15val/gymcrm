@@ -4,7 +4,9 @@ import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,9 +20,10 @@ import java.util.function.Predicate;
 @Slf4j
 public class UserService {
 
+	@Autowired
 	private final UserRepository userRepository;
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public User getUserById(Long userId) {
 		try {
 			if(isUsernameAndPasswordValid(userId)) {
@@ -41,7 +44,7 @@ public class UserService {
 		return null;
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Long createUser(String firstName, String lastName) {
 		User user = User.builder()
 				.firstName(firstName)
@@ -101,6 +104,9 @@ public class UserService {
 	}
 
 	public String generateUsername(String firstName, String lastName) {
+		if(userRepository == null) {
+			return  firstName + "." + lastName;
+		}
 		Predicate<String> usernameExists = userRepository::existsByUsername;
 		String username = firstName + "." + lastName;
 		int serialNumber = 1;

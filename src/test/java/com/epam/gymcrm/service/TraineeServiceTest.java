@@ -3,6 +3,7 @@ package com.epam.gymcrm.service;
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.User;
+import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.repository.TraineeRepository;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
@@ -51,7 +52,7 @@ class TraineeServiceTest {
 		MockitoAnnotations.openMocks(this);
 	}
 	@Test
-	void testCreateTrainee_Success() {
+	void testCreateTrainee_Success() throws UserNotFoundException {
 		// Arrange
 		Trainee trainee = createDummyTrainee();
 		when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(trainee.getUser()));
@@ -65,16 +66,15 @@ class TraineeServiceTest {
 	}
 
 	@Test
-	void testCreateTrainee_UserNotFoundException() {
+	void testCreateTrainee_UserNotFoundException() throws UserNotFoundException {
 		// Arrange
 		Trainee trainee = createDummyTrainee();
 		when(userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
 		// Act
-		Long traineeId = traineeService.createTrainee(trainee);
-
-		// Assert
-		Assertions.assertNull(traineeId);
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			traineeService.createTrainee(trainee);
+		});
 		verify(traineeRepository, never()).save(any());
 	}
 

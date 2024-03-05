@@ -11,6 +11,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,18 +26,20 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "trainer", schema = "gymcrm_shema", catalog = "gymcrm")
 public class Trainer {
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
 	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trainer_seq")
+	@SequenceGenerator(name = "trainer_seq", sequenceName = "trainer_seq", allocationSize = 1)
+	@Id
 	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name="specialization", referencedColumnName = "id")
 	private TrainingType trainingType2;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user1;
 

@@ -7,7 +7,9 @@ import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,11 +23,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class TrainerService {
+
+	@Autowired
 	private final TrainerRepository trainerRepository;
+	@Autowired
 	private final UserRepository userRepository;
+	@Autowired
 	private final UserService userService;
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Long createTrainer(Trainer trainer) {
 		try {
 			if(userRepository.findById(trainer.getUser1().getId()).orElse(null) == null){
@@ -75,7 +81,7 @@ public class TrainerService {
 			throw e;
 		}
 	}
-	
+
 	@Transactional
 	public void switchActive(Long trainerId) {
 		try {

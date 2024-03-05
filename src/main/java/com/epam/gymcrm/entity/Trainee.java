@@ -11,12 +11,14 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -24,11 +26,13 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "trainee", schema = "gymcrm_shema", catalog = "gymcrm")
 public class Trainee {
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
 	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trainee_seq")
+	@SequenceGenerator(name = "trainee_seq", sequenceName = "trainee_seq", allocationSize = 1)
+	@Id
 	private Long id;
 
 	@Column(name = "date_of_birth")
@@ -37,7 +41,7 @@ public class Trainee {
 	@Column(name = "address")
 	private String  address;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
 
