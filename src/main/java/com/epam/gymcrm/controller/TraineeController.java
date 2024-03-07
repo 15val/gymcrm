@@ -2,7 +2,9 @@ package com.epam.gymcrm.controller;
 
 import com.epam.gymcrm.dto.request.CreateTraineeDto;
 import com.epam.gymcrm.dto.request.UpdateTraineeDto;
+import com.epam.gymcrm.dto.request.UpdateTraineesTrainerListDto;
 import com.epam.gymcrm.dto.response.UpdateTraineeResponseDto;
+import com.epam.gymcrm.dto.response.UpdateTraineesTrainerListResponseDto;
 import com.epam.gymcrm.dto.response.UsernameAndPasswordResponseDto;
 import com.epam.gymcrm.facade.TraineeFacade;
 
@@ -42,6 +44,18 @@ public class TraineeController {
 		}
 		catch (Exception e) {
 			log.error("Controller: Error while updating trainee: {}", e.getMessage());
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@PutMapping("/updateTrainersList")
+	public ResponseEntity<UpdateTraineesTrainerListResponseDto> updateTraineesTrainerList(@RequestBody UpdateTraineesTrainerListDto request) {
+		try{
+			UpdateTraineesTrainerListResponseDto response = traineeFacade.updateTraineesTrainerListFacade(request);
+			return ResponseEntity.ok(response);
+		}
+		catch (Exception e) {
+			log.error("Controller: Error while updating trainee's trainer list: {}", e.getMessage());
 			return ResponseEntity.internalServerError().build();
 		}
 	}
