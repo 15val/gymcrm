@@ -1,6 +1,6 @@
 package com.epam.gymcrm.facade;
 
-import com.epam.gymcrm.dto.request.AddTrainingDto;
+import com.epam.gymcrm.dto.AddTrainingDto;
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;

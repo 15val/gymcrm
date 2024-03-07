@@ -1,15 +1,14 @@
-package com.epam.gymcrm.dto.request;
+package com.epam.gymcrm.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class UpdateTraineeDto {
+public class UpdateTrainerDto {
 
 	@NotNull
 	private String username;
@@ -20,11 +19,8 @@ public class UpdateTraineeDto {
 	@NotNull
 	private String lastName;
 
-	@Nullable
-	private String dateOfBirth;
-
-	@Nullable
-	private String address;
+	@NotNull
+	private String specialization;
 
 	@NotNull
 	private String isActive;

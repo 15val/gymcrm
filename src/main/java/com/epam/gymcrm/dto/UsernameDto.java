@@ -1,18 +1,18 @@
-package com.epam.gymcrm.dto.response;
+package com.epam.gymcrm.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class UpdateTraineesTrainerListResponseDto {
+@NoArgsConstructor
+public class UsernameDto {
 
 	@Nullable
-	List<TrainerDto> trainerList;
+	private String username;
 
 }

@@ -1,16 +1,19 @@
 package com.epam.gymcrm.controller;
 
-import com.epam.gymcrm.dto.request.CreateTraineeDto;
-import com.epam.gymcrm.dto.request.UpdateTraineeDto;
-import com.epam.gymcrm.dto.request.UpdateTraineesTrainerListDto;
-import com.epam.gymcrm.dto.response.UpdateTraineeResponseDto;
-import com.epam.gymcrm.dto.response.UpdateTraineesTrainerListResponseDto;
-import com.epam.gymcrm.dto.response.UsernameAndPasswordResponseDto;
+import com.epam.gymcrm.dto.CreateTraineeDto;
+import com.epam.gymcrm.dto.GetTraineeDto;
+import com.epam.gymcrm.dto.UpdateTraineeDto;
+import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
+import com.epam.gymcrm.dto.UpdateTraineeResponseDto;
+import com.epam.gymcrm.dto.UpdateTraineesTrainerListResponseDto;
+import com.epam.gymcrm.dto.UsernameAndPasswordDto;
+import com.epam.gymcrm.dto.UsernameDto;
 import com.epam.gymcrm.facade.TraineeFacade;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,9 +29,9 @@ public class TraineeController {
 	private final TraineeFacade traineeFacade;
 
 	@PostMapping("/register")
-	public ResponseEntity<UsernameAndPasswordResponseDto> registerTrainee(@RequestBody CreateTraineeDto request) {
+	public ResponseEntity<UsernameAndPasswordDto> registerTrainee(@RequestBody CreateTraineeDto request) {
 		try {
-			UsernameAndPasswordResponseDto response = traineeFacade.registerTraineeFacade(request);
+			UsernameAndPasswordDto response = traineeFacade.registerTraineeFacade(request);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while creating trainee: {}", e.getMessage());
@@ -56,6 +59,17 @@ public class TraineeController {
 		}
 		catch (Exception e) {
 			log.error("Controller: Error while updating trainee's trainer list: {}", e.getMessage());
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@GetMapping("/get")
+	public ResponseEntity<GetTraineeDto> getTrainee(@RequestBody UsernameDto request){
+		try {
+			GetTraineeDto response = traineeFacade.getTraineeFacade(request);
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			log.error("Controller: Error while retrieving trainee: {}", e.getMessage());
 			return ResponseEntity.internalServerError().build();
 		}
 	}

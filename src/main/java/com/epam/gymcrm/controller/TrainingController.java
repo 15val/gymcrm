@@ -1,6 +1,6 @@
 package com.epam.gymcrm.controller;
 
-import com.epam.gymcrm.dto.request.AddTrainingDto;
+import com.epam.gymcrm.dto.AddTrainingDto;
 import com.epam.gymcrm.facade.TrainingFacade;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

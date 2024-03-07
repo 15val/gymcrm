@@ -1,6 +1,5 @@
-package com.epam.gymcrm.dto.response;
+package com.epam.gymcrm.dto;
 
-import com.epam.gymcrm.entity.Trainer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,15 +7,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class UpdateTraineeResponseDto {
-
-	@NotNull
-	private String username;
+public class GetTraineeDto {
 
 	@NotNull
 	private String firstName;
@@ -35,5 +30,4 @@ public class UpdateTraineeResponseDto {
 
 	@Nullable
 	private List<TrainerDto> trainerList;
-
 }

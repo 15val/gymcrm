@@ -1,13 +1,14 @@
 package com.epam.gymcrm.facade;
 
-import com.epam.gymcrm.dto.request.CreateTraineeDto;
-import com.epam.gymcrm.dto.request.UpdateTraineeDto;
-import com.epam.gymcrm.dto.request.UpdateTraineesTrainerListDto;
-import com.epam.gymcrm.dto.request.UsernameDto;
-import com.epam.gymcrm.dto.response.TrainerDto;
-import com.epam.gymcrm.dto.response.UpdateTraineeResponseDto;
-import com.epam.gymcrm.dto.response.UpdateTraineesTrainerListResponseDto;
-import com.epam.gymcrm.dto.response.UsernameAndPasswordResponseDto;
+import com.epam.gymcrm.dto.CreateTraineeDto;
+import com.epam.gymcrm.dto.GetTraineeDto;
+import com.epam.gymcrm.dto.UpdateTraineeDto;
+import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
+import com.epam.gymcrm.dto.UsernameDto;
+import com.epam.gymcrm.dto.TrainerDto;
+import com.epam.gymcrm.dto.UpdateTraineeResponseDto;
+import com.epam.gymcrm.dto.UpdateTraineesTrainerListResponseDto;
+import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.User;
@@ -25,7 +26,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Component
 @Service
@@ -38,7 +38,7 @@ public class TraineeFacade {
 	private final TrainerService trainerService;
 
 	@Transactional
-	public UsernameAndPasswordResponseDto registerTraineeFacade(CreateTraineeDto request) throws UserNotFoundException, ParseException {
+	public UsernameAndPasswordDto registerTraineeFacade(CreateTraineeDto request) throws UserNotFoundException, ParseException {
 		try {
 			String firstName = request.getFirstName();
 			String lastName = request.getLastName();
@@ -54,7 +54,7 @@ public class TraineeFacade {
 				trainee.setDateOfBirth(dateFormat.parse(request.getDateOfBirth()));
 			}
 			traineeService.createTrainee(trainee);
-			return new UsernameAndPasswordResponseDto(user.getUsername(), user.getPassword());
+			return new UsernameAndPasswordDto(user.getUsername(), user.getPassword());
 		} catch (Exception e) {
 			log.error("Facade: Error while creating trainee: {}", e.getMessage());
 			throw e;
@@ -139,6 +139,34 @@ public class TraineeFacade {
 			return new UpdateTraineesTrainerListResponseDto(trainerList);
 		} catch (Exception e) {
 			log.error("Facade: Error while updating trainee's trainer list: {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	@Transactional
+	public GetTraineeDto getTraineeFacade(UsernameDto request){
+		try {
+			String username = request.getUsername();
+			Trainee trainee = traineeService.getTraineeByUsername(username);
+			List<Trainer> trainerList = trainee.getTrainerList();
+			List<TrainerDto> trainerDtoList = new ArrayList<>();
+			if (trainerList != null) {
+				for (Trainer trainer : trainerList) {
+					TrainerDto trainerDto = TrainerDto.builder()
+							.trainerUsername(trainer.getUser1().getUsername())
+							.trainerFirstName(trainer.getUser1().getFirstName())
+							.trainerLastName(trainer.getUser1().getLastName())
+							.specialization(String.valueOf(trainer.getTrainingType2().getId()))
+							.build();
+					trainerDtoList.add(trainerDto);
+				}
+			}
+			return new GetTraineeDto(trainee.getUser().getFirstName(),
+					trainee.getUser().getLastName(), String.valueOf(trainee.getDateOfBirth()), trainee.getAddress(),
+					String.valueOf(trainee.getUser().getIsActive()), trainerDtoList);
+		}
+		catch (Exception e) {
+			log.error("Facade: Error while retrieving trainee: {}", e.getMessage());
 			throw e;
 		}
 	}
