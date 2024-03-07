@@ -38,12 +38,10 @@ public class TraineeController {
 	public ResponseEntity<UpdateTraineeResponseDto> updateTrainee(@RequestBody UpdateTraineeDto request) {
 		try{
 			UpdateTraineeResponseDto response = traineeFacade.updateTraineeFacade(request);
-			log.info("response returned to controller");
 			return ResponseEntity.ok(response);
 		}
 		catch (Exception e) {
 			log.error("Controller: Error while updating trainee: {}", e.getMessage());
-			e.printStackTrace();
 			return ResponseEntity.internalServerError().build();
 		}
 	}

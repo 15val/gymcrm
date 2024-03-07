@@ -94,11 +94,9 @@ public class TraineeFacade {
 					trainerDtoList.add(trainerDto);
 				}
 			}
-			UpdateTraineeResponseDto response = new UpdateTraineeResponseDto(user.getUsername(), user.getFirstName(),
+			return new UpdateTraineeResponseDto(user.getUsername(), user.getFirstName(),
 					user.getLastName(), String.valueOf(trainee.getDateOfBirth()), trainee.getAddress(),
 					String.valueOf(user.getIsActive()), trainerDtoList);
-			log.info("response created: " + response);
-			return response;
 		}
 		catch (Exception e) {
 			log.error("Facade: Error while updating trainee: {}", e.getMessage());
