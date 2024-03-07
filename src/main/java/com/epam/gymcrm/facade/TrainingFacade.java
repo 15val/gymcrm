@@ -12,6 +12,7 @@ import com.epam.gymcrm.service.TrainerService;
 import com.epam.gymcrm.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -52,9 +53,17 @@ public class TrainingFacade {
 					.trainingDuration(trainingDuration)
 					.build();
 			trainingService.createTraining(training);
-		} catch (Exception e) {
+			trainee.getTrainerList().add(trainer);
+			trainer.getTraineeList().add(trainee);
+			traineeService.updateTrainee(trainee);
+			trainerService.updateTrainer(trainer);
+		}
+		catch (DataIntegrityViolationException e){
+			log.error("Facade: Training for these trainer and trainee already exists");
+			throw e;
+		}
+		catch (Exception e) {
 			log.error("Facade: Error while creating training: {}", e.getMessage());
-			e.printStackTrace();
 			throw e;
 		}
 	}
