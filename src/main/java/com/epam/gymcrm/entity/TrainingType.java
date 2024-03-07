@@ -12,6 +12,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -32,8 +35,10 @@ public class TrainingType {
 	private String trainingTypeName;
 
 	@OneToMany(mappedBy="trainingType1")
-	private Set<Training> trainingSet;
+	@Nullable
+	private List<Training> trainingList;
 
 	@OneToMany(mappedBy="trainingType2")
-	private Set<Trainer> trainerSet;
+	@Nullable
+	private List<Trainer> trainerList;
 }

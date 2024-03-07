@@ -23,7 +23,7 @@ public class UserService {
 	@Autowired
 	private final UserRepository userRepository;
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public User getUserById(Long userId) {
 		try {
 			if(isUsernameAndPasswordValid(userId)) {
@@ -44,7 +44,7 @@ public class UserService {
 		return null;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public Long createUser(String firstName, String lastName) {
 		User user = User.builder()
 				.firstName(firstName)

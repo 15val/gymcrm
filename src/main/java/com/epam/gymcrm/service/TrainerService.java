@@ -14,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +33,7 @@ public class TrainerService {
 	@Autowired
 	private final UserService userService;
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public Long createTrainer(Trainer trainer) {
 		try {
 			if(userRepository.findById(trainer.getUser1().getId()).orElse(null) == null){
@@ -138,16 +140,16 @@ public class TrainerService {
 		return null;
 	}
 
-	public Set<Training> getTrainingsByTrainerUsernameAndCriteria(String username, Date fromDate, Date toDate, String traineeUsername) throws UserNotFoundException {
+	public List<Training> getTrainingsByTrainerUsernameAndCriteria(String username, Date fromDate, Date toDate, String traineeUsername) throws UserNotFoundException {
 		try {
 			User user = userRepository.findByUsername(username);
 			if(userService.isUsernameAndPasswordValid(user.getId())) {
-				Set<Training> trainings = new HashSet<>(user.getTrainer().getTrainingSet());
+				List<Training> trainings = new ArrayList<>(user.getTrainer().getTrainingList());
 				trainings = trainings.stream()
 						.filter(training -> fromDate == null || training.getTrainingDate().after(fromDate))
 						.filter(training -> toDate == null || training.getTrainingDate().before(toDate))
 						.filter(training -> traineeUsername == null || training.getTrainee1().getUser().getUsername().equals(traineeUsername))
-						.collect(Collectors.toSet());
+						.collect(Collectors.toList());
 				return trainings;
 			}
 			else {
