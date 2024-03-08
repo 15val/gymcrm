@@ -10,7 +10,6 @@ import com.epam.gymcrm.repository.TraineeRepository;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,11 +102,11 @@ public class TraineeService {
 	}
 
 	@Transactional
-	public void switchActive(Long traineeId) {
+	public void updateIsActive(String username, boolean isActive) {
 		try {
-			User user = userService.getUserById(getTraineeById(traineeId).getUser().getId());
+			User user = getTraineeByUsername(username).getUser();
 			if(userService.isUsernameAndPasswordValid(user.getId())) {
-				user.setIsActive(!user.getIsActive());
+				user.setIsActive(isActive);
 				userService.updateUser(user);
 			}
 			else {

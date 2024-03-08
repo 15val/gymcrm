@@ -6,6 +6,7 @@ import com.epam.gymcrm.dto.GetTrainerDto;
 import com.epam.gymcrm.dto.UpdateTrainerDto;
 import com.epam.gymcrm.dto.TraineeDto;
 import com.epam.gymcrm.dto.UpdateTrainerResponseDto;
+import com.epam.gymcrm.dto.UsernameAndIsActiveDto;
 import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.dto.UsernameDto;
 import com.epam.gymcrm.entity.Trainee;
@@ -32,6 +33,7 @@ public class TrainerFacade {
 	private final TrainerService trainerService;
 	private final UserService userService;
 	private final TrainingTypeService trainingTypeService;
+
 	@Transactional
 	public UsernameAndPasswordDto registerTrainerFacade(CreateTrainerDto request) {
 		try {
@@ -54,8 +56,8 @@ public class TrainerFacade {
 	}
 
 	@Transactional
-	public UpdateTrainerResponseDto updateTrainerFacade(UpdateTrainerDto request){
-		try{
+	public UpdateTrainerResponseDto updateTrainerFacade(UpdateTrainerDto request) {
+		try {
 			String username = request.getUsername();
 			String firstName = request.getFirstName();
 			String lastName = request.getLastName();
@@ -72,8 +74,8 @@ public class TrainerFacade {
 
 			List<Trainee> traineeList = trainer.getTraineeList();
 			List<TraineeDto> traineeDtoList = new ArrayList<>();
-			if(traineeList != null){
-				for (Trainee trainee : traineeList){
+			if (traineeList != null) {
+				for (Trainee trainee : traineeList) {
 					TraineeDto traineeDto = new TraineeDto();
 					traineeDto.setTraineeUsername(trainee.getUser().getUsername());
 					traineeDto.setTraineeFirstName(trainee.getUser().getFirstName());
@@ -84,22 +86,21 @@ public class TrainerFacade {
 			return new UpdateTrainerResponseDto(user.getUsername(), user.getFirstName(),
 					user.getLastName(), String.valueOf(trainer.getTrainingType2().getId()),
 					String.valueOf(user.getIsActive()), traineeDtoList);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Facade: Error while updating trainer: {}", e.getMessage());
 			throw e;
 		}
 	}
 
 	@Transactional
-	public GetTrainerDto getTrainerFacade(UsernameDto request){
+	public GetTrainerDto getTrainerFacade(UsernameDto request) {
 		try {
 			String username = request.getUsername();
 			Trainer trainer = trainerService.getTrainerByUsername(username);
 			List<Trainee> traineeList = trainer.getTraineeList();
 			List<TraineeDto> traineeDtoList = new ArrayList<>();
-			if(traineeList != null){
-				for (Trainee trainee : traineeList){
+			if (traineeList != null) {
+				for (Trainee trainee : traineeList) {
 					TraineeDto traineeDto = new TraineeDto();
 					traineeDto.setTraineeUsername(trainee.getUser().getUsername());
 					traineeDto.setTraineeFirstName(trainee.getUser().getFirstName());
@@ -110,11 +111,21 @@ public class TrainerFacade {
 			return new GetTrainerDto(trainer.getUser1().getFirstName(),
 					trainer.getUser1().getLastName(), String.valueOf(trainer.getTrainingType2().getId()),
 					String.valueOf(trainer.getUser1().getIsActive()), traineeDtoList);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Facade: Error while retrieving trainee: {}", e.getMessage());
 			throw e;
 		}
+	}
 
+	@Transactional
+	public void updateIsActiveTrainer(UsernameAndIsActiveDto request) {
+		try {
+			String username = request.getUsername();
+			boolean isActive = Boolean.parseBoolean(request.getIsActive());
+			trainerService.updateIsActive(username, isActive);
+		} catch (Exception e) {
+			log.error("Facade: Error while updating isActive trainer: {}", e.getMessage());
+			throw e;
+		}
 	}
 }

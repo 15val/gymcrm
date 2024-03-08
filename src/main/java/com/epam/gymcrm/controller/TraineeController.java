@@ -1,19 +1,24 @@
 package com.epam.gymcrm.controller;
 
+import com.epam.gymcrm.dto.AddTrainingDto;
 import com.epam.gymcrm.dto.CreateTraineeDto;
 import com.epam.gymcrm.dto.GetTraineeDto;
 import com.epam.gymcrm.dto.UpdateTraineeDto;
 import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
 import com.epam.gymcrm.dto.UpdateTraineeResponseDto;
 import com.epam.gymcrm.dto.UpdateTraineesTrainerListResponseDto;
+import com.epam.gymcrm.dto.UsernameAndIsActiveDto;
 import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.dto.UsernameDto;
 import com.epam.gymcrm.facade.TraineeFacade;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,6 +75,28 @@ public class TraineeController {
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while retrieving trainee: {}", e.getMessage());
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@DeleteMapping("/delete")
+	public ResponseEntity<HttpStatus> deleteTrainee(@RequestBody UsernameDto request) {
+		try {
+			traineeFacade.deleteTraineeFacade(request);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			log.error("Controller: Error while deleting trainee: {}", e.getMessage());
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@PatchMapping("/updateIsActive")
+	public ResponseEntity<HttpStatus> updateIsActive(@RequestBody UsernameAndIsActiveDto request) {
+		try {
+			traineeFacade.updateIsActiveTrainee(request);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			log.error("Controller: Error while updating isActive trainee: {}", e.getMessage());
 			return ResponseEntity.internalServerError().build();
 		}
 	}

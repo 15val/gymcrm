@@ -85,11 +85,11 @@ public class TrainerService {
 	}
 
 	@Transactional
-	public void switchActive(Long trainerId) {
+	public void updateIsActive(String username, boolean isActive) {
 		try {
-			User user = userService.getUserById(getTrainerById(trainerId).getUser1().getId());
+			User user = getTrainerByUsername(username).getUser1();
 			if(userService.isUsernameAndPasswordValid(user.getId())) {
-				user.setIsActive(!user.getIsActive());
+				user.setIsActive(isActive);
 				userService.updateUser(user);
 			}
 			else {

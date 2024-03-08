@@ -4,6 +4,7 @@ import com.epam.gymcrm.dto.CreateTraineeDto;
 import com.epam.gymcrm.dto.GetTraineeDto;
 import com.epam.gymcrm.dto.UpdateTraineeDto;
 import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
+import com.epam.gymcrm.dto.UsernameAndIsActiveDto;
 import com.epam.gymcrm.dto.UsernameDto;
 import com.epam.gymcrm.dto.TrainerDto;
 import com.epam.gymcrm.dto.UpdateTraineeResponseDto;
@@ -144,7 +145,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public GetTraineeDto getTraineeFacade(UsernameDto request){
+	public GetTraineeDto getTraineeFacade(UsernameDto request) {
 		try {
 			String username = request.getUsername();
 			Trainee trainee = traineeService.getTraineeByUsername(username);
@@ -164,11 +165,32 @@ public class TraineeFacade {
 			return new GetTraineeDto(trainee.getUser().getFirstName(),
 					trainee.getUser().getLastName(), String.valueOf(trainee.getDateOfBirth()), trainee.getAddress(),
 					String.valueOf(trainee.getUser().getIsActive()), trainerDtoList);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Facade: Error while retrieving trainee: {}", e.getMessage());
 			throw e;
 		}
 	}
 
+	@Transactional
+	public void deleteTraineeFacade(UsernameDto request) {
+		try {
+			String username = request.getUsername();
+			traineeService.deleteTraineeByUsername(username);
+		} catch (Exception e) {
+			log.error("Facade: Error while deleting trainee: {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	@Transactional
+	public void updateIsActiveTrainee(UsernameAndIsActiveDto request) {
+		try {
+			String username = request.getUsername();
+			boolean isActive = Boolean.parseBoolean(request.getIsActive());
+			traineeService.updateIsActive(username, isActive);
+		} catch (Exception e) {
+			log.error("Facade: Error while updating isActive trainee: {}", e.getMessage());
+			throw e;
+		}
+	}
 }

@@ -5,13 +5,16 @@ import com.epam.gymcrm.dto.GetTraineeDto;
 import com.epam.gymcrm.dto.GetTrainerDto;
 import com.epam.gymcrm.dto.UpdateTrainerDto;
 import com.epam.gymcrm.dto.UpdateTrainerResponseDto;
+import com.epam.gymcrm.dto.UsernameAndIsActiveDto;
 import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.dto.UsernameDto;
 import com.epam.gymcrm.facade.TrainerFacade;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +60,17 @@ public class TrainerController {
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while retrieving trainer: {}", e.getMessage());
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@PatchMapping("/updateIsActive")
+	public ResponseEntity<HttpStatus> updateIsActive(@RequestBody UsernameAndIsActiveDto request) {
+		try {
+			trainerFacade.updateIsActiveTrainer(request);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			log.error("Controller: Error while updating isActive trainer: {}", e.getMessage());
 			return ResponseEntity.internalServerError().build();
 		}
 	}

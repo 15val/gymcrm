@@ -130,7 +130,7 @@ class TraineeServiceTest {
 		when(userService.isUsernameAndPasswordValid(any(Long.class))).thenReturn(true);
 		when(traineeRepository.findById(any(Long.class))).thenReturn(Optional.of(trainee));
 		// Act
-		traineeService.switchActive(user.getId());
+		traineeService.updateIsActive(user.getId());
 
 		// Assert
 		Assertions.assertFalse(user.getIsActive());
