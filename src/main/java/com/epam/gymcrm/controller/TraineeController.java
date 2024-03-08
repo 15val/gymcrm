@@ -3,6 +3,9 @@ package com.epam.gymcrm.controller;
 import com.epam.gymcrm.dto.AddTrainingDto;
 import com.epam.gymcrm.dto.CreateTraineeDto;
 import com.epam.gymcrm.dto.GetTraineeDto;
+import com.epam.gymcrm.dto.GetTraineesTrainingListRequestDto;
+import com.epam.gymcrm.dto.GetTrainerListDto;
+import com.epam.gymcrm.dto.GetTrainingListDto;
 import com.epam.gymcrm.dto.UpdateTraineeDto;
 import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
 import com.epam.gymcrm.dto.UpdateTraineeResponseDto;
@@ -97,6 +100,28 @@ public class TraineeController {
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			log.error("Controller: Error while updating isActive trainee: {}", e.getMessage());
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@GetMapping("/getUnassignedTrainers")
+	public ResponseEntity<GetTrainerListDto> getUnassignedTrainers(@RequestBody UsernameDto request) {
+		try {
+			GetTrainerListDto response = traineeFacade.getUnassignedTrainersFacade(request);
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			log.error("Controller: Error while retrieving unassigned trainers: {}", e.getMessage());
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@GetMapping("/getTrainingList")
+	public ResponseEntity<GetTrainingListDto> getTraineesTrainingList (@RequestBody GetTraineesTrainingListRequestDto request){
+		try {
+			GetTrainingListDto response = traineeFacade.getTraineesTrainingListFacade(request);
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			log.error("Controller: Error while retrieving trainee's list of trainings: {}", e.getMessage());
 			return ResponseEntity.internalServerError().build();
 		}
 	}

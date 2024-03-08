@@ -2,7 +2,10 @@ package com.epam.gymcrm.controller;
 
 import com.epam.gymcrm.dto.CreateTrainerDto;
 import com.epam.gymcrm.dto.GetTraineeDto;
+import com.epam.gymcrm.dto.GetTraineesTrainingListRequestDto;
 import com.epam.gymcrm.dto.GetTrainerDto;
+import com.epam.gymcrm.dto.GetTrainersTrainingListRequestDto;
+import com.epam.gymcrm.dto.GetTrainingListDto;
 import com.epam.gymcrm.dto.UpdateTrainerDto;
 import com.epam.gymcrm.dto.UpdateTrainerResponseDto;
 import com.epam.gymcrm.dto.UsernameAndIsActiveDto;
@@ -71,6 +74,17 @@ public class TrainerController {
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			log.error("Controller: Error while updating isActive trainer: {}", e.getMessage());
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@GetMapping("/getTrainingList")
+	public ResponseEntity<GetTrainingListDto> getTrainersTrainingList (@RequestBody GetTrainersTrainingListRequestDto request){
+		try {
+			GetTrainingListDto response = trainerFacade.getTrainersTrainingListFacade(request);
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			log.error("Controller: Error while retrieving trainer's list of trainings: {}", e.getMessage());
 			return ResponseEntity.internalServerError().build();
 		}
 	}

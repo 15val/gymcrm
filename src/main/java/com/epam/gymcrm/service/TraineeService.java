@@ -207,7 +207,14 @@ public class TraineeService {
 				//trainers who assigned to this trainee
 				List<Trainer> assignedTrainers = user.getTrainee().getTrainerList();
 				// remove all assigned trainers
-				allTrainers.removeAll(assignedTrainers);
+				if(assignedTrainers != null) {
+					allTrainers.removeAll(assignedTrainers);
+				}
+				for(Trainer trainer : allTrainers){//remove all inactive trainers
+					if(Boolean.FALSE.equals(trainer.getUser1().getIsActive())){
+						allTrainers.remove(trainer);
+					}
+				}
 				return new ArrayList<>(allTrainers);
 			} else {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
@@ -219,4 +226,6 @@ public class TraineeService {
 		throw new UserNotFoundException("Unassigned trainers not found");
 
 	}
+
+
 }

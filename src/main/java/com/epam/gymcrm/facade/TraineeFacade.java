@@ -2,6 +2,10 @@ package com.epam.gymcrm.facade;
 
 import com.epam.gymcrm.dto.CreateTraineeDto;
 import com.epam.gymcrm.dto.GetTraineeDto;
+import com.epam.gymcrm.dto.GetTraineesTrainingListRequestDto;
+import com.epam.gymcrm.dto.GetTrainerListDto;
+import com.epam.gymcrm.dto.GetTrainingListDto;
+import com.epam.gymcrm.dto.TrainingDto;
 import com.epam.gymcrm.dto.UpdateTraineeDto;
 import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
 import com.epam.gymcrm.dto.UsernameAndIsActiveDto;
@@ -12,6 +16,7 @@ import com.epam.gymcrm.dto.UpdateTraineesTrainerListResponseDto;
 import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
+import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.service.TraineeService;
@@ -26,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -190,6 +196,69 @@ public class TraineeFacade {
 			traineeService.updateIsActive(username, isActive);
 		} catch (Exception e) {
 			log.error("Facade: Error while updating isActive trainee: {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	@Transactional
+	public GetTrainerListDto getUnassignedTrainersFacade(UsernameDto request) throws UserNotFoundException {
+		try {
+			String username = request.getUsername();
+			List<Trainer> trainerList = traineeService.getUnassignedTrainersByTraineeUsername(username);
+			List<TrainerDto> trainerDtoList = new ArrayList<>();
+			if (trainerList != null) {
+				for (Trainer trainer : trainerList) {
+					TrainerDto trainerDto = TrainerDto.builder()
+							.trainerUsername(trainer.getUser1().getUsername())
+							.trainerFirstName(trainer.getUser1().getFirstName())
+							.trainerLastName(trainer.getUser1().getLastName())
+							.specialization(String.valueOf(trainer.getTrainingType2().getId()))
+							.build();
+					trainerDtoList.add(trainerDto);
+				}
+			}
+			return new GetTrainerListDto(trainerDtoList);
+		}
+		catch (Exception e) {
+			log.error("Facade: Error while retrieving unassigned trainers: {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	@Transactional
+	public GetTrainingListDto getTraineesTrainingListFacade(GetTraineesTrainingListRequestDto request) throws UserNotFoundException, ParseException {
+		try {
+			String traineeUsername = request.getTraineeUsername();
+			String trainingTypeName = request.getTrainingTypeName();
+			String trainerUsername = request.getTrainerUsername();
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Date periodFrom = null;
+			if(request.getPeriodFrom() != null){
+				periodFrom = dateFormat.parse(request.getPeriodFrom());
+			}
+			Date periodTo = null;
+			if(request.getPeriodTo() != null){
+				periodTo = dateFormat.parse(request.getPeriodTo());
+			}
+			List<Training> trainingList = traineeService.getTrainingsByTraineeUsernameAndCriteria(
+					traineeUsername, periodFrom, periodTo, trainerUsername, trainingTypeName);
+			List<TrainingDto> trainingDtoList = new ArrayList<>();
+			if(trainingList != null){
+				for(Training training : trainingList){
+					TrainingDto trainingDto = TrainingDto.builder()
+							.trainingName(training.getTrainingName())
+							.trainingDate(String.valueOf(training.getTrainingDate()))
+							.trainingType(training.getTrainingType1().getTrainingTypeName())
+							.trainingDuration(String.valueOf(training.getTrainingDuration()))
+							.username(training.getTrainer1().getUser1().getUsername())
+							.build();
+					trainingDtoList.add(trainingDto);
+				}
+			}
+			return new GetTrainingListDto(trainingDtoList);
+ 		}
+		catch (Exception e) {
+			log.error("Facade: Error while retrieving trainee's training list: {}", e.getMessage());
 			throw e;
 		}
 	}
