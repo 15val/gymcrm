@@ -3,9 +3,11 @@ package com.epam.gymcrm.service;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.TrainingType;
+import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -41,10 +44,10 @@ class TrainingTypeServiceTest {
 
 
 	@Test
-	void testGetTrainingTypeById_ValidId_Success() {
+	void testGetTrainingTypeById_ValidId_Success() throws UserNotFoundException {
 		// Arrange
 		Long trainingTypeId = 1L;
-		TrainingType expectedTrainingType = new TrainingType(trainingTypeId, "Test Training Type", new HashSet<Training>(), new HashSet<Trainer>());
+		TrainingType expectedTrainingType = new TrainingType(trainingTypeId, "Test Training Type", new ArrayList<Training>(), new ArrayList<Trainer>());
 		when(trainingTypeRepository.findById(trainingTypeId)).thenReturn(Optional.of(expectedTrainingType));
 
 		// Act
@@ -57,16 +60,12 @@ class TrainingTypeServiceTest {
 	}
 
 	@Test
-	void testGetTrainingTypeById_InvalidId_ReturnsNull() {
-		// Arrange
+	void testGetTrainingTypeById_InvalidId_ReturnsNull() throws UserNotFoundException {
 		Long invalidTrainingTypeId = 999L;
 		when(trainingTypeRepository.findById(invalidTrainingTypeId)).thenReturn(Optional.empty());
-
-		// Act
-		TrainingType result = trainingTypeService.getTrainingTypeById(invalidTrainingTypeId);
-
-		// Assert
-		assertNull(result);
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+					trainingTypeService.getTrainingTypeById(invalidTrainingTypeId);
+				});
 	}
 
 }

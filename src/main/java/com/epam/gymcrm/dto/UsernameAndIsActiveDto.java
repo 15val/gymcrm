@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class UsernameAndIsActiveDto {
 
 	@NotNull

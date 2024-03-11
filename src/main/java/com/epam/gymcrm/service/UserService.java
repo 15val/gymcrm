@@ -24,7 +24,7 @@ public class UserService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public User getUserById(Long userId) {
+	public User getUserById(Long userId) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			if(isUsernameAndPasswordValid(userId)) {
 				User user = userRepository.findById(userId).orElse(null);
@@ -40,8 +40,8 @@ public class UserService {
 		}
 		catch (Exception e) {
 			log.error("Error while retrieving user: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
@@ -59,12 +59,12 @@ public class UserService {
 		}
 		catch (Exception e) {
 			log.error("Error while creating user: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
-	public Long updateUser(User user) {
+	public Long updateUser(User user) throws UsernameOrPasswordInvalidException {
 		try {
 			if(isUsernameAndPasswordValid(user.getId())) {
 				User existingUser = userRepository.findById(user.getId()).orElse(null);
@@ -80,12 +80,12 @@ public class UserService {
 		}
 		catch (Exception e) {
 			log.error("Error while updating user: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
-	public void deleteUser(Long userId) {
+	public void deleteUser(Long userId) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			if(isUsernameAndPasswordValid(userId)) {
 				User user = userRepository.findById(userId).orElse(null);
@@ -100,6 +100,7 @@ public class UserService {
 			}
 		} catch (Exception e) {
 			log.error("Error while deleting user: {}", e.getMessage());
+			throw e;
 		}
 	}
 

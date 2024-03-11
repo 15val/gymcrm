@@ -50,7 +50,7 @@ public class TraineeService {
 	}
 
 	@Transactional
-	public Long updateTrainee(Trainee trainee) {
+	public Long updateTrainee(Trainee trainee) throws UsernameOrPasswordInvalidException {
 		try {
 			if(userService.isUsernameAndPasswordValid(trainee.getUser().getId())){
 				traineeRepository.save(trainee);
@@ -61,12 +61,12 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while updating trainee: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
-	public void deleteTrainee(Long traineeId) {
+	public void deleteTrainee(Long traineeId) throws UserNotFoundException {
 		try {
 			Trainee trainee = traineeRepository.findById(traineeId).orElse(null);
 			if (trainee == null) {
@@ -82,11 +82,12 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while deleting trainee: {}", e.getMessage());
+			throw e;
 		}
 	}
 
 	@Transactional
-	public Trainee getTraineeById(Long traineeId) {
+	public Trainee getTraineeById(Long traineeId) throws UsernameOrPasswordInvalidException {
 		try {
 			Trainee trainee = traineeRepository.findById(traineeId).orElse(null);
 			if(trainee != null && userService.isUsernameAndPasswordValid(trainee.getUser().getId())) {
@@ -97,12 +98,12 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while retrieving trainee: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
-	public void updateIsActive(String username, boolean isActive) {
+	public void updateIsActive(String username, boolean isActive) throws UsernameOrPasswordInvalidException {
 		try {
 			User user = getTraineeByUsername(username).getUser();
 			if(userService.isUsernameAndPasswordValid(user.getId())) {
@@ -114,11 +115,12 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while switching active of trainee: {}", e.getMessage());
+			throw e;
 		}
 	}
 
 	@Transactional
-	public void changePassword(Long traineeId, String newPassword) {
+	public void changePassword(Long traineeId, String newPassword) throws UsernameOrPasswordInvalidException, UserNotFoundException {
 		try {
 			Trainee trainee = getTraineeById(traineeId);
 			if (trainee != null && userService.isUsernameAndPasswordValid(trainee.getUser().getId())) {
@@ -130,11 +132,12 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while changing password of trainee: {}", e.getMessage());
+			throw e;
 		}
 	}
 
 	@Transactional
-	public void updateTrainersList(Long traineeId, List<Trainer> trainerList) {
+	public void updateTrainersList(Long traineeId, List<Trainer> trainerList) throws UsernameOrPasswordInvalidException {
 		try {
 			Trainee trainee = getTraineeById(traineeId);
 			if (userService.isUsernameAndPasswordValid(trainee.getUser().getId())) {
@@ -145,11 +148,12 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while updating trainers list of trainee: {}", e.getMessage());
+			throw e;
 		}
 	}
 
 	@Transactional
-	public Trainee getTraineeByUsername(String username) {
+	public Trainee getTraineeByUsername(String username) throws UsernameOrPasswordInvalidException {
 		try {
 			Trainee trainee = traineeRepository.findById(userRepository.findByUsername(username).getTrainee().getId()).orElse(null);
 			if (trainee != null && userService.isUsernameAndPasswordValid(trainee.getUser().getId())) {
@@ -159,12 +163,12 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while retrieving trainee: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
-	public void deleteTraineeByUsername(String username) {
+	public void deleteTraineeByUsername(String username) throws UsernameOrPasswordInvalidException, UserNotFoundException {
 		try {
 			if (userService.isUsernameAndPasswordValid(getTraineeByUsername(username).getUser().getId())) {
 				deleteTrainee(getTraineeByUsername(username).getId());
@@ -173,6 +177,7 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while deleting trainee: {}", e.getMessage());
+			throw e;
 		}
 	}
 
@@ -221,7 +226,6 @@ public class TraineeService {
 			}
 		} catch (Exception e) {
 			log.error("Error while retrieving unassigned trainers by trainee username: {}", e.getMessage());
-
 		}
 		throw new UserNotFoundException("Unassigned trainers not found");
 

@@ -18,6 +18,7 @@ import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
+import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.service.TrainerService;
 import com.epam.gymcrm.service.TrainingTypeService;
 import com.epam.gymcrm.service.UserService;
@@ -44,7 +45,7 @@ public class TrainerFacade {
 	private final TrainingTypeService trainingTypeService;
 
 	@Transactional
-	public UsernameAndPasswordDto registerTrainerFacade(CreateTrainerDto request) {
+	public UsernameAndPasswordDto registerTrainerFacade(CreateTrainerDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			String firstName = request.getFirstName();
 			String lastName = request.getLastName();
@@ -65,7 +66,7 @@ public class TrainerFacade {
 	}
 
 	@Transactional
-	public UpdateTrainerResponseDto updateTrainerFacade(UpdateTrainerDto request) {
+	public UpdateTrainerResponseDto updateTrainerFacade(UpdateTrainerDto request) throws UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			String firstName = request.getFirstName();
@@ -127,7 +128,7 @@ public class TrainerFacade {
 	}
 
 	@Transactional
-	public void updateIsActiveTrainer(UsernameAndIsActiveDto request) {
+	public void updateIsActiveTrainer(UsernameAndIsActiveDto request) throws UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			boolean isActive = Boolean.parseBoolean(request.getIsActive());

@@ -85,7 +85,7 @@ public class TrainerService {
 	}
 
 	@Transactional
-	public void updateIsActive(String username, boolean isActive) {
+	public void updateIsActive(String username, boolean isActive) throws UsernameOrPasswordInvalidException {
 		try {
 			User user = getTrainerByUsername(username).getUser1();
 			if(userService.isUsernameAndPasswordValid(user.getId())) {
@@ -98,6 +98,7 @@ public class TrainerService {
 		}
 		catch (Exception e) {
 			log.error("Error while switching active of trainer: {}", e.getMessage());
+			throw e;
 		}
 	}
 

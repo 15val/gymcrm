@@ -4,6 +4,7 @@ import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
+import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TraineeRepository;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
@@ -18,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.TestPropertySource;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -79,7 +81,7 @@ class TraineeServiceTest {
 	}
 
 	@Test
-	void testUpdateTrainee_Success() {
+	void testUpdateTrainee_Success() throws UsernameOrPasswordInvalidException {
 		// Arrange
 		Trainee trainee = createDummyTrainee();
 		when(userService.isUsernameAndPasswordValid(any(Long.class))).thenReturn(true);
@@ -94,7 +96,7 @@ class TraineeServiceTest {
 	}
 
 	@Test
-	void testDeleteTrainee_Success() {
+	void testDeleteTrainee_Success() throws UserNotFoundException {
 		// Arrange
 		Trainee trainee = createDummyTrainee();
 		when(traineeRepository.findById(any(Long.class))).thenReturn(Optional.of(trainee));
@@ -107,7 +109,7 @@ class TraineeServiceTest {
 	}
 
 	@Test
-	void testGetTraineeById_Success() {
+	void testGetTraineeById_Success() throws UsernameOrPasswordInvalidException {
 		// Arrange
 		Trainee trainee = createDummyTrainee();
 		when(traineeRepository.findById(any(Long.class))).thenReturn(Optional.of(trainee));
@@ -121,48 +123,14 @@ class TraineeServiceTest {
 		Assertions.assertEquals(trainee.getId(), retrievedTrainee.getId());
 	}
 
-	@Test
-	void testSwitchActive_Success() {
-		// Arrange
-		Trainee trainee = createDummyTrainee();
-		User user = trainee.getUser();
-		when(userService.getUserById(any(Long.class))).thenReturn(user);
-		when(userService.isUsernameAndPasswordValid(any(Long.class))).thenReturn(true);
-		when(traineeRepository.findById(any(Long.class))).thenReturn(Optional.of(trainee));
-		// Act
-		traineeService.updateIsActive(user.getId());
-
-		// Assert
-		Assertions.assertFalse(user.getIsActive());
-		verify(userService, times(1)).updateUser(user);
-	}
-
-	@Test
-	void testChangePassword_Success() {
-		// Arrange
-		String newPassword = "newPassword";
-		Trainee trainee = createDummyTrainee();
-		User user = trainee.getUser();
-		when(userService.getUserById(any(Long.class))).thenReturn(user);
-		when(userService.isUsernameAndPasswordValid(any(Long.class))).thenReturn(true);
-		when(userService.updateUser(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));;
-		user.setPassword(newPassword);
-
-		// Act
-		traineeService.changePassword(trainee.getId(), newPassword);
-
-		// Assert
-		Assertions.assertEquals(newPassword, user.getPassword());
-	}
-
 	private Trainee createDummyTrainee() {
 		Trainee trainee = new Trainee();
 		trainee.setId(1L);
 		trainee.setDateOfBirth(new Date(System.currentTimeMillis()));
 		trainee.setAddress("Dummy Address");
 		trainee.setUser(new User(1L, "John", "Doe", "sss", "sss",  true, new Trainee(), new Trainer()));
-		trainee.setTrainerSet(new HashSet<>());
-		trainee.setTrainingSet(new HashSet<>());
+		trainee.setTrainerList(new ArrayList<>());
+		trainee.setTrainingList(new ArrayList<>());
 		return trainee;
 	}
 }

@@ -18,7 +18,7 @@ public class TrainingTypeService {
 	@Autowired
 	private final TrainingTypeRepository trainingTypeRepository;
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public TrainingType getTrainingTypeById(Long trainingTypeId) {
+	public TrainingType getTrainingTypeById(Long trainingTypeId) throws UserNotFoundException {
 		try {
 			TrainingType trainingType = trainingTypeRepository.findById(trainingTypeId).orElse(null);
 			if(trainingType == null){
@@ -30,8 +30,8 @@ public class TrainingTypeService {
 		}
 		catch (Exception e) {
 			log.error("Error while retrieving training type: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 }

@@ -3,8 +3,11 @@ package com.epam.gymcrm.service;
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.User;
+import com.epam.gymcrm.exception.UserNotFoundException;
+import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.UserRepository;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -65,7 +68,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void testGetUserById_WithValidId() {
+	void testGetUserById_WithValidId() throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		User user = new User();
 		user.setId(1L);
 		user.setUsername("sss");
@@ -77,10 +80,11 @@ class UserServiceTest {
 	}
 
 	@Test
-	void testGetUserById_WithInvalidId() {
+	void testGetUserById_WithInvalidId() throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		when(userRepository.findById(2L)).thenReturn(Optional.empty());
-		User retrievedUser = userService.getUserById(2L);
-		assertNull(retrievedUser);
+		Assertions.assertThrows(UsernameOrPasswordInvalidException.class, () -> {
+			userService.getUserById(2L);
+		});
 	}
 
 	@Test
@@ -91,7 +95,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void testUpdateUser_WithValidUser() {
+	void testUpdateUser_WithValidUser() throws UsernameOrPasswordInvalidException {
 		User user = new User();
 		user.setId(1L);
 		user.setUsername("john.doe");
@@ -103,27 +107,28 @@ class UserServiceTest {
 	}
 
 	@Test
-	void testUpdateUser_WithInvalidUser() {
+	void testUpdateUser_WithInvalidUser() throws UsernameOrPasswordInvalidException {
 		User user = new User();
 		user.setId(2L);
 		when(userRepository.findById(2L)).thenReturn(Optional.empty());
-		Long updatedUserId = userService.updateUser(user);
-		assertNull(updatedUserId);
+		Assertions.assertThrows(UsernameOrPasswordInvalidException.class, () -> {
+			userService.updateUser(user);
+		});
 	}
 
 	@Test
-	void testDeleteUser_WithValidId() {
+	void testDeleteUser_WithValidId() throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		User user = new User();
 		user.setId(1L);
-		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+		when(userRepository.findById(1L)).thenReturn(Optional.of(new User(1L, "John", "Doe", "sss", "sss", true, new Trainee(), new Trainer())));
 		userService.deleteUser(1L);
-		// No assertion, just testing if it runs without exception
 	}
 
 	@Test
-	void testDeleteUser_WithInvalidId() {
+	void testDeleteUser_WithInvalidId() throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		when(userRepository.findById(2L)).thenReturn(Optional.empty());
-		userService.deleteUser(2L);
-		// No assertion, just testing if it runs without exception
+		Assertions.assertThrows(UsernameOrPasswordInvalidException.class, () -> {
+			userService.deleteUser(2L);
+		});
 	}
 }

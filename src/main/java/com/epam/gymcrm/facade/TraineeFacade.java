@@ -19,6 +19,7 @@ import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
+import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.service.TraineeService;
 import com.epam.gymcrm.service.TrainerService;
 import com.epam.gymcrm.service.UserService;
@@ -45,7 +46,7 @@ public class TraineeFacade {
 	private final TrainerService trainerService;
 
 	@Transactional
-	public UsernameAndPasswordDto registerTraineeFacade(CreateTraineeDto request) throws UserNotFoundException, ParseException {
+	public UsernameAndPasswordDto registerTraineeFacade(CreateTraineeDto request) throws UserNotFoundException, ParseException, UsernameOrPasswordInvalidException {
 		try {
 			String firstName = request.getFirstName();
 			String lastName = request.getLastName();
@@ -69,7 +70,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public UpdateTraineeResponseDto updateTraineeFacade(UpdateTraineeDto request) throws ParseException {
+	public UpdateTraineeResponseDto updateTraineeFacade(UpdateTraineeDto request) throws ParseException, UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			String firstName = request.getFirstName();
@@ -116,7 +117,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public UpdateTraineesTrainerListResponseDto updateTraineesTrainerListFacade(UpdateTraineesTrainerListDto request) {
+	public UpdateTraineesTrainerListResponseDto updateTraineesTrainerListFacade(UpdateTraineesTrainerListDto request) throws UsernameOrPasswordInvalidException {
 		try {
 			String traineeUsername = request.getTraineeUsername();
 			Trainee trainee = traineeService.getTraineeByUsername(traineeUsername);
@@ -151,7 +152,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public GetTraineeDto getTraineeFacade(UsernameDto request) {
+	public GetTraineeDto getTraineeFacade(UsernameDto request) throws UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			Trainee trainee = traineeService.getTraineeByUsername(username);
@@ -178,7 +179,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public void deleteTraineeFacade(UsernameDto request) {
+	public void deleteTraineeFacade(UsernameDto request) throws UsernameOrPasswordInvalidException, UserNotFoundException {
 		try {
 			String username = request.getUsername();
 			traineeService.deleteTraineeByUsername(username);
@@ -189,7 +190,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public void updateIsActiveTrainee(UsernameAndIsActiveDto request) {
+	public void updateIsActiveTrainee(UsernameAndIsActiveDto request) throws UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			boolean isActive = Boolean.parseBoolean(request.getIsActive());
