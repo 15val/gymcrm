@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -92,8 +93,8 @@ class TrainingServiceTest {
 				.id(2L)
 				.trainingType2(trainingType)
 				.user1(userTrainer)
-				.traineeSet(Set.of(trainee))
-				.trainingSet(Set.of(training))
+				.traineeList(List.of(trainee))
+				.trainingList(List.of(training))
 				.build();
 
 

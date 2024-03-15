@@ -7,13 +7,17 @@ import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,8 +25,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class TrainerService {
+
+	@Autowired
 	private final TrainerRepository trainerRepository;
+	@Autowired
 	private final UserRepository userRepository;
+	@Autowired
 	private final UserService userService;
 
 	@Transactional
@@ -43,16 +51,9 @@ public class TrainerService {
 	@Transactional
 	public Long updateTrainer(Trainer trainer) {
 		try {
-			if(userService.isUsernameAndPasswordValid(trainer.getId())) {
-				Trainer updatedTrainer = Trainer.builder()
-						.id(trainer.getId())
-						.user1(trainer.getUser1())
-						.trainingSet(trainer.getTrainingSet())
-						.traineeSet(trainer.getTraineeSet())
-						.trainingType2(trainer.getTrainingType2())
-						.build();
-				trainerRepository.save(updatedTrainer);
-				return updatedTrainer.getId();
+			if(userService.isUsernameAndPasswordValid(trainer.getUser1().getId())) {
+				trainerRepository.save(trainer);
+				return trainer.getId();
 			}
 			else {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
@@ -83,16 +84,12 @@ public class TrainerService {
 		}
 	}
 
-	public void deleteTrainer(Long trainerId) {
-		throw new UnsupportedOperationException("Not allowed to delete trainer");
-	}
-
 	@Transactional
-	public void switchActive(Long trainerId) {
+	public void updateIsActive(String username, boolean isActive) throws UsernameOrPasswordInvalidException {
 		try {
-			User user = userService.getUserById(getTrainerById(trainerId).getUser1().getId());
+			User user = getTrainerByUsername(username).getUser1();
 			if(userService.isUsernameAndPasswordValid(user.getId())) {
-				user.setIsActive(!user.getIsActive());
+				user.setIsActive(isActive);
 				userService.updateUser(user);
 			}
 			else {
@@ -101,6 +98,7 @@ public class TrainerService {
 		}
 		catch (Exception e) {
 			log.error("Error while switching active of trainer: {}", e.getMessage());
+			throw e;
 		}
 	}
 
@@ -143,16 +141,16 @@ public class TrainerService {
 		return null;
 	}
 
-	public Set<Training> getTrainingsByTrainerUsernameAndCriteria(String username, Date fromDate, Date toDate, String traineeUsername) throws UserNotFoundException {
+	public List<Training> getTrainingsByTrainerUsernameAndCriteria(String username, Date fromDate, Date toDate, String traineeUsername) throws UserNotFoundException {
 		try {
 			User user = userRepository.findByUsername(username);
 			if(userService.isUsernameAndPasswordValid(user.getId())) {
-				Set<Training> trainings = new HashSet<>(user.getTrainer().getTrainingSet());
+				List<Training> trainings = new ArrayList<>(user.getTrainer().getTrainingList());
 				trainings = trainings.stream()
 						.filter(training -> fromDate == null || training.getTrainingDate().after(fromDate))
 						.filter(training -> toDate == null || training.getTrainingDate().before(toDate))
 						.filter(training -> traineeUsername == null || training.getTrainee1().getUser().getUsername().equals(traineeUsername))
-						.collect(Collectors.toSet());
+						.collect(Collectors.toList());
 				return trainings;
 			}
 			else {

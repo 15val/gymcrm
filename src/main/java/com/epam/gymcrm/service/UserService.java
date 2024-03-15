@@ -4,10 +4,14 @@ import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -16,10 +20,11 @@ import java.util.function.Predicate;
 @Slf4j
 public class UserService {
 
+	@Autowired
 	private final UserRepository userRepository;
 
 	@Transactional
-	public User getUserById(Long userId) {
+	public User getUserById(Long userId) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			if(isUsernameAndPasswordValid(userId)) {
 				User user = userRepository.findById(userId).orElse(null);
@@ -35,8 +40,8 @@ public class UserService {
 		}
 		catch (Exception e) {
 			log.error("Error while retrieving user: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
@@ -54,24 +59,20 @@ public class UserService {
 		}
 		catch (Exception e) {
 			log.error("Error while creating user: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
-	public Long updateUser(User user) {
+	public Long updateUser(User user) throws UsernameOrPasswordInvalidException {
 		try {
 			if(isUsernameAndPasswordValid(user.getId())) {
-				User updatedUser = User.builder()
-						.id(user.getId())
-						.firstName(user.getFirstName())
-						.lastName(user.getLastName())
-						.username(user.getUsername())
-						.password(user.getPassword())
-						.isActive(user.getIsActive())
-						.build();
-				userRepository.save(updatedUser);
-				return updatedUser.getId();
+				User existingUser = userRepository.findById(user.getId()).orElse(null);
+				if(existingUser != null && !Objects.equals(user.getUsername(), existingUser.getUsername())){
+					throw new UnsupportedOperationException("Username cannot be changed");
+				}
+				userRepository.save(user);
+				return user.getId();
 			}
 			else {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
@@ -79,12 +80,12 @@ public class UserService {
 		}
 		catch (Exception e) {
 			log.error("Error while updating user: {}", e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	@Transactional
-	public void deleteUser(Long userId) {
+	public void deleteUser(Long userId) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			if(isUsernameAndPasswordValid(userId)) {
 				User user = userRepository.findById(userId).orElse(null);
@@ -99,10 +100,14 @@ public class UserService {
 			}
 		} catch (Exception e) {
 			log.error("Error while deleting user: {}", e.getMessage());
+			throw e;
 		}
 	}
 
 	public String generateUsername(String firstName, String lastName) {
+		if(userRepository == null) {
+			return  firstName + "." + lastName;
+		}
 		Predicate<String> usernameExists = userRepository::existsByUsername;
 		String username = firstName + "." + lastName;
 		int serialNumber = 1;

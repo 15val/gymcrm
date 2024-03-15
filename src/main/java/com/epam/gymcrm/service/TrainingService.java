@@ -6,7 +6,8 @@ import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class TrainingService {
+
+	@Autowired
 	private final TrainingRepository trainingRepository;
+	@Autowired
 	private final TrainingTypeRepository trainingTypeRepository;
+	@Autowired
 	private final UserRepository userRepository;
+	@Autowired
 	private final UserService userService;
 
 	@Transactional
@@ -59,10 +65,4 @@ public class TrainingService {
 		}
 	}
 
-	public void deleteTraining(Long trainingId) {
-		throw new UnsupportedOperationException("Not allowed to delete training");
-	}
-	public Training updateTraining(Training training) {
-		throw new UnsupportedOperationException("Not allowed to update training");
-	}
 }

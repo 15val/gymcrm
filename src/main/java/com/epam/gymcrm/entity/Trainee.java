@@ -1,5 +1,10 @@
 package com.epam.gymcrm.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,44 +16,56 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 
-import java.sql.Date;
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
+@Table(name = "trainee", schema = "gymcrm_shema", catalog = "gymcrm")
 public class Trainee {
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
 	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trainee_seq")
+	@SequenceGenerator(name = "trainee_seq", sequenceName = "trainee_seq", allocationSize = 1)
+	@Id
 	private Long id;
 
 	@Column(name = "date_of_birth")
+	@Nullable
 	private Date dateOfBirth;
 
 	@Column(name = "address")
-	private String  address;
+	@Nullable
+	private String address;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = {CascadeType.ALL})
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
 
-	@ManyToMany(cascade = { CascadeType.ALL })
+	@ManyToMany(cascade = {CascadeType.ALL})
+	@Nullable
 	@JoinTable(
 			name = "trainee_trainer",
-			joinColumns = { @JoinColumn(name = "trainee_id") },
-			inverseJoinColumns = { @JoinColumn(name = "trainer_id") }
+			schema = "gymcrm_shema", catalog = "gymcrm",
+			joinColumns = {@JoinColumn(name = "trainee_id")},
+			inverseJoinColumns = {@JoinColumn(name = "trainer_id")}
 	)
-	private Set<Trainer> trainerSet;
+	private List<Trainer> trainerList;
 
-	@OneToMany(mappedBy="trainee1", cascade = { CascadeType.ALL })
-	private Set<Training> trainingSet;
+	@OneToMany(mappedBy = "trainee1", cascade = {CascadeType.ALL})
+	@Nullable
+	private List<Training> trainingList;
+
 }
