@@ -10,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Component
-@Slf4j
 public class InternalServiceHealthIndicator implements HealthIndicator {
 
 	@Override

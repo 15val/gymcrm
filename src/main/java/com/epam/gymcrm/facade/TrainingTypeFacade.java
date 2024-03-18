@@ -9,6 +9,7 @@ import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.service.TrainingTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class TrainingTypeFacade {
 
 	private final TrainingTypeRepository trainingTypeRepository;
 
+	@Profile("default")
 	public GetTrainingTypeListDto getTrainingTypeListFacade(){
 		try {
 			List<TrainingType> trainingTypeList = trainingTypeRepository.findAll();
@@ -33,6 +35,52 @@ public class TrainingTypeFacade {
 						.trainingTypeName(trainingType.getTrainingTypeName())
 						.build();
 				trainingTypeDtoList.add(trainingTypeDto);
+			}
+			return new GetTrainingTypeListDto(trainingTypeDtoList);
+		}
+		catch (Exception e) {
+			log.error("Facade: Error while retrieving training types : {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	@Profile("dev")
+	public GetTrainingTypeListDto getDevTrainingTypeListFacade(){
+		try {
+			List<TrainingType> trainingTypeList = trainingTypeRepository.findAll();
+			List<TrainingTypeDto> trainingTypeDtoList = new ArrayList<>();
+			for (TrainingType trainingType : trainingTypeList) {
+				TrainingTypeDto trainingTypeDto = TrainingTypeDto.builder()
+						.trainingTypeId(String.valueOf(trainingType.getId()))
+						.trainingTypeName(trainingType.getTrainingTypeName())
+						.build();
+				trainingTypeDtoList.add(trainingTypeDto);
+				if(trainingTypeList.size() > 1){
+					return new GetTrainingTypeListDto(trainingTypeDtoList);
+				}
+			}
+			return new GetTrainingTypeListDto(trainingTypeDtoList);
+		}
+		catch (Exception e) {
+			log.error("Facade: Error while retrieving training types : {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	@Profile("local")
+	public GetTrainingTypeListDto getLocalTrainingTypeListFacade(){
+		try {
+			List<TrainingType> trainingTypeList = trainingTypeRepository.findAll();
+			List<TrainingTypeDto> trainingTypeDtoList = new ArrayList<>();
+			for (TrainingType trainingType : trainingTypeList) {
+				TrainingTypeDto trainingTypeDto = TrainingTypeDto.builder()
+						.trainingTypeId(String.valueOf(trainingType.getId()))
+						.trainingTypeName(trainingType.getTrainingTypeName())
+						.build();
+				trainingTypeDtoList.add(trainingTypeDto);
+				if(trainingTypeList.size() > 3){
+					return new GetTrainingTypeListDto(trainingTypeDtoList);
+				}
 			}
 			return new GetTrainingTypeListDto(trainingTypeDtoList);
 		}
