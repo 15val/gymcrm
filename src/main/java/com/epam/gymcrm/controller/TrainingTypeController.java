@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/trainingType")
 @Slf4j
-@Profile("default")
 public class TrainingTypeController {
 
 	private final TrainingTypeFacade trainingTypeFacade;
