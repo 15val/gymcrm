@@ -24,7 +24,6 @@ public class TrainingTypeFacade {
 
 	private final TrainingTypeRepository trainingTypeRepository;
 
-	@Profile("default")
 	public GetTrainingTypeListDto getTrainingTypeListFacade(){
 		try {
 			List<TrainingType> trainingTypeList = trainingTypeRepository.findAll();

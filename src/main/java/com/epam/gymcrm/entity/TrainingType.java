@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -41,4 +42,5 @@ public class TrainingType {
 	@OneToMany(mappedBy="trainingType2")
 	@Nullable
 	private List<Trainer> trainerList;
+
 }
