@@ -8,6 +8,7 @@ import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.UserRepository;
 import com.epam.gymcrm.service.UserService;
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;

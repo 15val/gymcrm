@@ -1,5 +1,7 @@
 package com.epam.gymcrm.config;
 
+import com.epam.gymcrm.controller.TrainingTypeController;
+import com.epam.gymcrm.facade.TrainingTypeFacade;
 import com.epam.gymcrm.repository.TraineeRepository;
 import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.TrainingRepository;
@@ -10,6 +12,9 @@ import com.epam.gymcrm.service.TrainerService;
 import com.epam.gymcrm.service.TrainingService;
 import com.epam.gymcrm.service.TrainingTypeService;
 import com.epam.gymcrm.service.UserService;
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
