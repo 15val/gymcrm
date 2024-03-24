@@ -50,6 +50,7 @@ public class TrainingTypeController {
 			GetTrainingTypeListDto response = trainingTypeFacade.getTrainingTypeListFacade();
 			counter.inc();
 			gauge.set(response.getTrainingTypeList().size());
+			log.info("Training type list successfully retrieved");
 			return ResponseEntity.ok(response);
 		}
 		catch (Exception e) {

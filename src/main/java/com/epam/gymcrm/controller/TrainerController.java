@@ -36,6 +36,7 @@ public class TrainerController {
 	public ResponseEntity<UsernameAndPasswordDto> registerTrainer(@RequestBody CreateTrainerDto request) {
 		try {
 			UsernameAndPasswordDto response = trainerFacade.registerTrainerFacade(request);
+			log.info("Trainer successfully registered");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while creating trainer: {}", e.getMessage());
@@ -48,6 +49,7 @@ public class TrainerController {
 	public ResponseEntity<UpdateTrainerResponseDto> updateTrainer(@RequestBody UpdateTrainerDto request) {
 		try{
 			UpdateTrainerResponseDto response = trainerFacade.updateTrainerFacade(request);
+			log.info("Trainer successfully updated");
 			return ResponseEntity.ok(response);
 		}
 		catch (Exception e) {
@@ -60,6 +62,7 @@ public class TrainerController {
 	public ResponseEntity<GetTrainerDto> getTrainer(@RequestBody UsernameDto request){
 		try {
 			GetTrainerDto response = trainerFacade.getTrainerFacade(request);
+			log.info("Trainer successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while retrieving trainer: {}", e.getMessage());
@@ -71,6 +74,7 @@ public class TrainerController {
 	public ResponseEntity<HttpStatus> updateIsActive(@RequestBody UsernameAndIsActiveDto request) {
 		try {
 			trainerFacade.updateIsActiveTrainer(request);
+			log.info("Trainer's isActive successfully updated");
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			log.error("Controller: Error while updating isActive trainer: {}", e.getMessage());
@@ -82,6 +86,7 @@ public class TrainerController {
 	public ResponseEntity<GetTrainingListDto> getTrainersTrainingList (@RequestBody GetTrainersTrainingListRequestDto request){
 		try {
 			GetTrainingListDto response = trainerFacade.getTrainersTrainingListFacade(request);
+			log.info("Trainer's list of trainings successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while retrieving trainer's list of trainings: {}", e.getMessage());

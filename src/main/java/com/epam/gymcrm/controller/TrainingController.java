@@ -23,6 +23,7 @@ public class TrainingController {
 	public ResponseEntity<HttpStatus> addTraining(@RequestBody AddTrainingDto request) {
 		try {
 			trainingFacade.addTrainingFacade(request);
+			log.info("Training successfully added");
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			log.error("Controller: Error while creating training: {}", e.getMessage());

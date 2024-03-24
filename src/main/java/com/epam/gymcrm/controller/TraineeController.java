@@ -40,6 +40,7 @@ public class TraineeController {
 	public ResponseEntity<UsernameAndPasswordDto> registerTrainee(@RequestBody CreateTraineeDto request) {
 		try {
 			UsernameAndPasswordDto response = traineeFacade.registerTraineeFacade(request);
+			log.info("Trainee successfully registered");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while creating trainee: {}", e.getMessage());
@@ -51,6 +52,7 @@ public class TraineeController {
 	public ResponseEntity<UpdateTraineeResponseDto> updateTrainee(@RequestBody UpdateTraineeDto request) {
 		try{
 			UpdateTraineeResponseDto response = traineeFacade.updateTraineeFacade(request);
+			log.info("Trainee successfully updated");
 			return ResponseEntity.ok(response);
 		}
 		catch (Exception e) {
@@ -63,6 +65,7 @@ public class TraineeController {
 	public ResponseEntity<UpdateTraineesTrainerListResponseDto> updateTraineesTrainerList(@RequestBody UpdateTraineesTrainerListDto request) {
 		try{
 			UpdateTraineesTrainerListResponseDto response = traineeFacade.updateTraineesTrainerListFacade(request);
+			log.info("Trainee's trainer list successfully updated");
 			return ResponseEntity.ok(response);
 		}
 		catch (Exception e) {
@@ -75,6 +78,7 @@ public class TraineeController {
 	public ResponseEntity<GetTraineeDto> getTrainee(@RequestBody UsernameDto request){
 		try {
 			GetTraineeDto response = traineeFacade.getTraineeFacade(request);
+			log.info("Trainee successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while retrieving trainee: {}", e.getMessage());
@@ -86,6 +90,7 @@ public class TraineeController {
 	public ResponseEntity<HttpStatus> deleteTrainee(@RequestBody UsernameDto request) {
 		try {
 			traineeFacade.deleteTraineeFacade(request);
+			log.info("Trainee successfully deleted");
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			log.error("Controller: Error while deleting trainee: {}", e.getMessage());
@@ -97,6 +102,7 @@ public class TraineeController {
 	public ResponseEntity<HttpStatus> updateIsActive(@RequestBody UsernameAndIsActiveDto request) {
 		try {
 			traineeFacade.updateIsActiveTrainee(request);
+			log.info("Trainee's isActive successfully updated");
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			log.error("Controller: Error while updating isActive trainee: {}", e.getMessage());
@@ -108,6 +114,7 @@ public class TraineeController {
 	public ResponseEntity<GetTrainerListDto> getUnassignedTrainers(@RequestBody UsernameDto request) {
 		try {
 			GetTrainerListDto response = traineeFacade.getUnassignedTrainersFacade(request);
+			log.info("Unassigned trainers successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while retrieving unassigned trainers: {}", e.getMessage());
@@ -119,6 +126,7 @@ public class TraineeController {
 	public ResponseEntity<GetTrainingListDto> getTraineesTrainingList (@RequestBody GetTraineesTrainingListRequestDto request){
 		try {
 			GetTrainingListDto response = traineeFacade.getTraineesTrainingListFacade(request);
+			log.info("Trainee's list of trainings successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			log.error("Controller: Error while retrieving trainee's list of trainings: {}", e.getMessage());
