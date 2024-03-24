@@ -24,6 +24,7 @@ public class LoginController {
 	ResponseEntity<HttpStatus> login(@RequestBody UsernameAndPasswordDto request){
 		try {
 			loginFacade.loginFacade(request);
+			log.info("Login successful: Username: " + request.getUsername() + ", Password: " + request.getPassword());
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			log.error("Controller: Error while login: {}", e.getMessage());

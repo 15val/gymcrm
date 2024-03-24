@@ -7,6 +7,7 @@ import com.epam.gymcrm.repository.TrainerRepository;
 import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
+import com.epam.gymcrm.service.AppUserDetailsService;
 import com.epam.gymcrm.service.TraineeService;
 import com.epam.gymcrm.service.TrainerService;
 import com.epam.gymcrm.service.TrainingService;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
@@ -32,6 +34,7 @@ public class AppConfig {
 	private TrainingTypeRepository trainingTypeRepository;
 	private UserRepository userRepository;
 	private UserService	userService;
+	private PasswordEncoder passwordEncoder;
 
 	@Bean
 	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
@@ -55,7 +58,7 @@ public class AppConfig {
 
 	@Bean
 	public UserService userService(){
-		return new UserService(userRepository);
+		return new UserService(userRepository, passwordEncoder);
 	}
 
 	@Bean
@@ -63,4 +66,8 @@ public class AppConfig {
 		return new TrainingTypeService(trainingTypeRepository);
 	}
 
+	@Bean
+	public AppUserDetailsService appUserDetailsService(){
+		return new AppUserDetailsService(userRepository);
+	}
 }
