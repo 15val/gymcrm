@@ -15,6 +15,7 @@ import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.dto.UsernameDto;
 import com.epam.gymcrm.facade.TraineeFacade;
 
+import jakarta.annotation.security.PermitAll;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TraineeController {
 
 	private final TraineeFacade traineeFacade;
+
 
 	@PostMapping("/register")
 	public ResponseEntity<UsernameAndPasswordDto> registerTrainee(@RequestBody CreateTraineeDto request) {

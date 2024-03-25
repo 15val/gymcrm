@@ -8,6 +8,7 @@ import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
 import com.epam.gymcrm.service.AppUserDetailsService;
+import com.epam.gymcrm.service.LoginAttemptService;
 import com.epam.gymcrm.service.TraineeService;
 import com.epam.gymcrm.service.TrainerService;
 import com.epam.gymcrm.service.TrainingService;
@@ -35,6 +36,7 @@ public class AppConfig {
 	private UserRepository userRepository;
 	private UserService	userService;
 	private PasswordEncoder passwordEncoder;
+	private LoginAttemptService loginAttemptService;
 
 	@Bean
 	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
@@ -68,6 +70,6 @@ public class AppConfig {
 
 	@Bean
 	public AppUserDetailsService appUserDetailsService(){
-		return new AppUserDetailsService(userRepository);
+		return new AppUserDetailsService(userRepository, loginAttemptService);
 	}
 }

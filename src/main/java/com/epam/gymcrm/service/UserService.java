@@ -135,6 +135,7 @@ public class UserService {
 			int index = random.nextInt(symbols.length());
 			password.append(symbols.charAt(index));
 		}
+		log.info("Generated password for current user: " + password);
 		return password.toString();
 	}
 
