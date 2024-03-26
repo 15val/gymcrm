@@ -29,7 +29,7 @@ public class JwtTokenUtil {
 		Map<String,Object> claims = new HashMap<>();
 		List<String> rolesList = userDetails.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
-				.collect(Collectors.toList());
+				.toList();
 		claims.put("roles", rolesList);
 
 		Date dateOfIssue = new Date();
@@ -45,7 +45,7 @@ public class JwtTokenUtil {
 
 	private Claims getAllClaimsFromToken(String token){
 		return Jwts.parser()
-				.setSigningKey(token)
+				.setSigningKey(secret)
 				.build()
 				.parseClaimsJws(token)
 				.getPayload();

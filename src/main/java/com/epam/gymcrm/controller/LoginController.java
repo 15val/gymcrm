@@ -46,22 +46,6 @@ public class LoginController {
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
 
-	/*@GetMapping("/login")
-	ResponseEntity<HttpStatus> login(@RequestBody UsernameAndPasswordDto request){
-		if(request == null){
-			log.info("Logged as unknown user");
-			return ResponseEntity.ok().build();
-		}
-		try {
-			loginFacade.loginFacade(request);
-			log.info("Login successful: Username: " + request.getUsername() + ", Password: " + request.getPassword());
-			return ResponseEntity.ok().build();
-		} catch (Exception e) {
-			log.error("Controller: Error while login: {}", e.getMessage());
-			return ResponseEntity.internalServerError().build();
-		}
-	}*/
-
 	@PutMapping("/updatePassword")
 	ResponseEntity<HttpStatus> updatePassword(@RequestBody UpdatePasswordDto request){
 		try {
