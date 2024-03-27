@@ -1,5 +1,7 @@
 package com.epam.gymcrm.filter;
 
+import com.epam.gymcrm.exception.TokenIsBlacklistedException;
+import com.epam.gymcrm.service.TokenBlacklistService;
 import com.epam.gymcrm.utils.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -24,33 +26,35 @@ import java.util.stream.Collectors;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
 	private final JwtTokenUtil jwtTokenUtil;
+	private final TokenBlacklistService tokenBlacklistService;
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		String authHeader = request.getHeader("Authorization");
 		String username = null;
 		String jwtToken = null;
-		if(authHeader != null && authHeader.startsWith("Bearer ")) {
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
 			jwtToken = authHeader.substring(7);
 			log.info("Authentication token is: " + jwtToken);
 			try {
+				if (tokenBlacklistService.isBlacklisted(jwtToken)) {
+					throw new TokenIsBlacklistedException("Authentication token is blacklisted");
+				}
 				username = jwtTokenUtil.getUsername(jwtToken);
-			}
-			catch (ExpiredJwtException e){
+			} catch (ExpiredJwtException e) {
 				log.error("Token expired");
-			}
-			catch (Exception e){
+			} catch (Exception e) {
 				log.error("Filter: Failure: " + e.getMessage());
-				e.printStackTrace();
 			}
 		}
 
-		if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
 					username,
 					null,
 					jwtTokenUtil.getRoles(jwtToken).stream()
 							.map(SimpleGrantedAuthority::new)
-							.collect(Collectors.toList())
+							.toList()
 			);
 			SecurityContextHolder.getContext().setAuthentication(token);
 		}

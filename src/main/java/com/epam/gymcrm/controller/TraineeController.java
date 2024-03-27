@@ -54,7 +54,7 @@ public class TraineeController {
 	public ResponseEntity<UpdateTraineeResponseDto> updateTrainee(@RequestBody UpdateTraineeDto request) {
 		try{
 			UpdateTraineeResponseDto response = traineeFacade.updateTraineeFacade(request);
-			log.info("Trainee successfully updated");
+			log.info("Trainee successfully updated " + response.toString());
 			return ResponseEntity.ok(response);
 		}
 		catch (Exception e) {

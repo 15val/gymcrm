@@ -74,9 +74,8 @@ public class SecurityConfig {
 						.loginProcessingUrl("/login")
 						.usernameParameter("username")
 						.passwordParameter("password")
-						.permitAll())
-				.logout(logout -> logout.logoutUrl("/logout")
 						.permitAll());
+
 		return http.build();
 	}
 

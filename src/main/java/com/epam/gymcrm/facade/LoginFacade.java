@@ -10,6 +10,7 @@ import com.epam.gymcrm.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,32 +25,18 @@ public class LoginFacade {
 
 	private final UserService userService;
 	private final UserRepository userRepository;
-
-	@Transactional
-	public void loginFacade(UsernameAndPasswordDto request) throws UserNotFoundException {
-		try{
-			String username = request.getUsername();
-			String password = request.getPassword();
-			User user = userRepository.findByUsername(username);
-			if(user == null || !Objects.equals(user.getPassword(), password)){
-				throw new UserNotFoundException("Username or password is incorrect");
-			}
-		} catch (Exception e) {
-			log.error("Facade: Error while login: {}", e.getMessage());
-			throw e;
-		}
-	}
-
+	private final PasswordEncoder passwordEncoder;
 	@Transactional
 	public void updatePasswordFacade(UpdatePasswordDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
-			String password = request.getPassword();
-			String newPassword = request.getNewPassword();
+			String password = passwordEncoder.encode(request.getPassword());
+			String newPassword = passwordEncoder.encode(request.getNewPassword());
 			User user = userRepository.findByUsername(username);
 			if(user == null || !Objects.equals(user.getPassword(), password)){
 				throw new UserNotFoundException("Username or password is incorrect");
 			}
+
 			user.setPassword(newPassword);
 			userService.updateUser(user);
 		}
