@@ -34,6 +34,7 @@ public class LoginController {
 
 	@GetMapping("/login")
 	ResponseEntity<?> login(@RequestBody UsernameAndPasswordDto request){
+		log.info("Login started: Username " + request.getUsername() + ", Password " + request.getPassword()) ;
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 			log.info("Login successful: Username: " + request.getUsername() + ", Password: " + request.getPassword());

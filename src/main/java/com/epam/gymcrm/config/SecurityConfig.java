@@ -29,6 +29,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 
 @Configuration
@@ -60,8 +61,13 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
-				.csrf(crsf -> crsf.disable())
-				.cors(cors -> cors.disable())
+				.cors(cors -> cors
+						.configurationSource(request -> {
+							CorsConfiguration config = new CorsConfiguration();
+							config.setAllowedOriginPatterns(List.of("http://localhost:3000")); // Allowed origins
+							config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE")); // Allowed HTTP methods
+							return config;
+						}))
 				.authorizeHttpRequests((auth) -> auth
 				.requestMatchers("/trainer/register", "/trainee/register", "/trainingType/get").permitAll()
 				.anyRequest().authenticated()
