@@ -28,7 +28,7 @@ public class AppUserDetailsService implements UserDetailsService {
 		}
 		try {
 			User user = userRepository.findByUsername(username);
-			log.info("Security AppUserDetailsService: User successfully found by username: " + username);
+			log.info("Security AppUserDetailsService: User successfully found by username: " + user.getUsername());
 			return new AppUserDetails(user);
 		}
 		catch (UsernameNotFoundException e) {

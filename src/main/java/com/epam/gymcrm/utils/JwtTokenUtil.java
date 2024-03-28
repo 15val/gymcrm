@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
@@ -35,10 +34,12 @@ public class JwtTokenUtil {
 		Date dateOfIssue = new Date();
 		Date dateOfExpiration = new Date(dateOfIssue.getTime() + jwtLifetime.toMillis());
 		return Jwts.builder()
-				.setClaims(claims)
-				.setSubject(userDetails.getUsername())
-				.setIssuedAt(dateOfIssue)
-				.setExpiration(dateOfExpiration)
+				.claims()
+				.issuedAt(dateOfIssue)
+				.expiration(dateOfExpiration)
+				.subject(userDetails.getUsername())
+				.add(claims)
+				.and()
 				.signWith(SignatureAlgorithm.HS256, secret)
 				.compact();
 	}

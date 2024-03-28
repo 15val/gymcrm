@@ -1,21 +1,18 @@
 package com.epam.gymcrm.controller;
 
-import com.epam.gymcrm.dto.AddTrainingDto;
 import com.epam.gymcrm.dto.CreateTraineeDto;
 import com.epam.gymcrm.dto.GetTraineeDto;
 import com.epam.gymcrm.dto.GetTraineesTrainingListRequestDto;
 import com.epam.gymcrm.dto.GetTrainerListDto;
 import com.epam.gymcrm.dto.GetTrainingListDto;
 import com.epam.gymcrm.dto.UpdateTraineeDto;
-import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
 import com.epam.gymcrm.dto.UpdateTraineeResponseDto;
+import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
 import com.epam.gymcrm.dto.UpdateTraineesTrainerListResponseDto;
 import com.epam.gymcrm.dto.UsernameAndIsActiveDto;
 import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.dto.UsernameDto;
 import com.epam.gymcrm.facade.TraineeFacade;
-
-import jakarta.annotation.security.PermitAll;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

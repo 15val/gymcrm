@@ -3,23 +3,19 @@ package com.epam.gymcrm.controller;
 import com.epam.gymcrm.dto.JwtResponse;
 import com.epam.gymcrm.dto.UpdatePasswordDto;
 import com.epam.gymcrm.dto.UsernameAndPasswordDto;
-import com.epam.gymcrm.entity.AppUserDetails;
 import com.epam.gymcrm.facade.LoginFacade;
 import com.epam.gymcrm.service.AppUserDetailsService;
 import com.epam.gymcrm.utils.JwtTokenUtil;
-import jakarta.annotation.security.PermitAll;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
