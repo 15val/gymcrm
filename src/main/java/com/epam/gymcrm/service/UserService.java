@@ -5,6 +5,7 @@ import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ public class UserService {
 
 	@Autowired
 	private final UserRepository userRepository;
+	@Autowired
+	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
 	public User getUserById(Long userId) throws UserNotFoundException, UsernameOrPasswordInvalidException {
@@ -46,11 +49,13 @@ public class UserService {
 
 	@Transactional
 	public Long createUser(String firstName, String lastName) {
+		String password = generatePassword();
+		String encodedPassword = passwordEncoder.encode(password);
 		User user = User.builder()
 				.firstName(firstName)
 				.lastName(lastName)
 				.username(generateUsername(firstName, lastName))
-				.password(generatePassword())
+				.password(encodedPassword)
 				.isActive(true)
 				.build();
 		try {
@@ -71,6 +76,9 @@ public class UserService {
 				if(existingUser != null && !Objects.equals(user.getUsername(), existingUser.getUsername())){
 					throw new UnsupportedOperationException("Username cannot be changed");
 				}
+				String password = user.getPassword();
+				String encodedPassword = passwordEncoder.encode(password);
+				user.setPassword(encodedPassword);
 				userRepository.save(user);
 				return user.getId();
 			}
@@ -127,6 +135,7 @@ public class UserService {
 			int index = random.nextInt(symbols.length());
 			password.append(symbols.charAt(index));
 		}
+		log.info("Generated password for current user: " + password);
 		return password.toString();
 	}
 
