@@ -1,6 +1,7 @@
 package com.epam.gymcrm.facade;
 
 import com.epam.gymcrm.dto.AddTrainingDto;
+import com.epam.gymcrm.dto.TrainingMicroserviceDto;
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
@@ -57,13 +58,33 @@ public class TrainingFacade {
 			trainer.getTraineeList().add(trainee);
 			traineeService.updateTrainee(trainee);
 			trainerService.updateTrainer(trainer);
-		}
-		catch (DataIntegrityViolationException e){
+		} catch (DataIntegrityViolationException e) {
 			log.error("Facade: Training for these trainer and trainee already exists");
 			throw e;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Facade: Error while creating training: {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	public TrainingMicroserviceDto createTrainingMicroserviceDto(AddTrainingDto request, String actionType) throws ParseException {
+		log.info("DTO creating started");
+		try {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Date trainingDate = dateFormat.parse(request.getTrainingDate());
+			Trainer trainer = trainerService.getTrainerByUsername(request.getTrainerUsername());
+			return TrainingMicroserviceDto.builder()
+					.trainerUsername(trainer.getUser1().getUsername())
+					.trainerFirstName(trainer.getUser1().getFirstName())
+					.trainerLastName(trainer.getUser1().getLastName())
+					.isActive(trainer.getUser1().getIsActive())
+					.trainingDate(trainingDate)
+					.trainingDuration(Integer.valueOf(request.getTrainingDuration()))
+					.actionType(actionType)
+					.build();
+
+		} catch (Exception e) {
+			log.error("Facade: Error while creating TrainingMicroserviceDto: {}", e.getMessage());
 			throw e;
 		}
 	}
