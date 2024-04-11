@@ -11,15 +11,22 @@ import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.service.TraineeService;
 import com.epam.gymcrm.service.TrainerService;
 import com.epam.gymcrm.service.TrainingService;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 @Component
 @Service
@@ -30,7 +37,8 @@ public class TrainingFacade {
 	private final TraineeService traineeService;
 	private final TrainerService trainerService;
 	private final TrainingService trainingService;
-
+	private final CircuitBreakerRegistry circuitBreakerRegistry;
+	private final RestTemplate restTemplate;
 	public void addTrainingFacade(AddTrainingDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException, ParseException {
 		try {
 			String traineeUsername = request.getTraineeUsername();
@@ -88,4 +96,33 @@ public class TrainingFacade {
 			throw e;
 		}
 	}
+
+	public void callMicroserviceFacade(TrainingMicroserviceDto trainingMicroserviceDto){
+		CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("trainingMicroserviceCallCircuitBreaker");
+		circuitBreaker.getEventPublisher()
+				.onError(event -> log.error("CircuitBreaker onError: {}", event.getThrowable().getMessage()))
+				.onStateTransition(event -> log.info("CircuitBreaker state transitioned: {}", event.getStateTransition()));
+
+		Callable<ResponseEntity> callable = () -> {
+			ResponseEntity response = restTemplate.postForEntity("http://localhost:9093/training/modifyWorkingTime", trainingMicroserviceDto, ResponseEntity.class);
+			if (response.getStatusCode() != HttpStatus.OK) {
+				throw new ResourceAccessException("Failed to call modifyWorkingTime");
+			}
+			return response;
+		};
+		Callable<ResponseEntity> decoratedCallable = CircuitBreaker.decorateCallable(circuitBreaker, callable);
+
+		for (int i = 0; i < 3; i++) {//3 attempts to call microservice
+			try {
+				decoratedCallable.call();
+				break;
+			} catch (Exception e) {
+				if (i == 2) {
+					throw new RuntimeException("Failed to call modifyWorkingTime", e);
+				}
+				log.error("Attempt {} to call modifyWorkingTime failed", i + 1, e);
+			}
+		}
+	}
+
 }

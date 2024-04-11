@@ -1,10 +1,12 @@
 package com.epam.gymcrm.controller;
 
+import com.epam.gymcrm.dto.AddTrainingDto;
 import com.epam.gymcrm.dto.CreateTraineeDto;
 import com.epam.gymcrm.dto.GetTraineeDto;
 import com.epam.gymcrm.dto.GetTraineesTrainingListRequestDto;
 import com.epam.gymcrm.dto.GetTrainerListDto;
 import com.epam.gymcrm.dto.GetTrainingListDto;
+import com.epam.gymcrm.dto.TrainingMicroserviceDto;
 import com.epam.gymcrm.dto.UpdateTraineeDto;
 import com.epam.gymcrm.dto.UpdateTraineeResponseDto;
 import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
@@ -12,7 +14,11 @@ import com.epam.gymcrm.dto.UpdateTraineesTrainerListResponseDto;
 import com.epam.gymcrm.dto.UsernameAndIsActiveDto;
 import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.dto.UsernameDto;
+import com.epam.gymcrm.entity.Trainee;
+import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.facade.TraineeFacade;
+import com.epam.gymcrm.facade.TrainingFacade;
+import com.epam.gymcrm.service.TraineeService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +32,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/trainee")
@@ -33,6 +42,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TraineeController {
 
 	private final TraineeFacade traineeFacade;
+	private final TraineeService traineeService;
+	private final TrainingFacade trainingFacade;
 
 
 	@PostMapping("/register")
@@ -88,6 +99,22 @@ public class TraineeController {
 	@DeleteMapping("/delete")
 	public ResponseEntity<HttpStatus> deleteTrainee(@RequestBody UsernameDto request) {
 		try {
+			String username = request.getUsername();
+			Trainee trainee = traineeService.getTraineeByUsername(username);
+			List<Training> trainingList = trainee.getTrainingList();
+			if(trainingList != null && !trainingList.isEmpty()) {
+				for (Training training : trainingList) {
+					AddTrainingDto addTrainingDto = AddTrainingDto.builder()
+							.traineeUsername(training.getTrainee1().getUser().getUsername())
+							.trainerUsername(training.getTrainer1().getUser1().getUsername())
+							.trainingDate(String.valueOf(training.getTrainingDate()))
+							.trainingDuration(String.valueOf(training.getTrainingDuration()))
+							.trainingName(training.getTrainingName())
+							.build();
+					TrainingMicroserviceDto trainingMicroserviceDto = trainingFacade.createTrainingMicroserviceDto(addTrainingDto, "DELETE");
+					trainingFacade.callMicroserviceFacade(trainingMicroserviceDto);
+				}
+			}
 			traineeFacade.deleteTraineeFacade(request);
 			log.info("Trainee successfully deleted");
 			return ResponseEntity.ok().build();
