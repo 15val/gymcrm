@@ -40,104 +40,104 @@ import static org.mockito.Mockito.when;
 	@Test
 	void testRegisterTrainee_Success() throws Exception {
 		// Arrange
-		when(traineeFacade.registerTraineeFacade(any(CreateTraineeDto.class))).thenReturn(new UsernameAndPasswordDto());
+		when(traineeFacade.registerTrainee(any(CreateTraineeDto.class))).thenReturn(new UsernameAndPasswordDto());
 
 		// Act
 		ResponseEntity<UsernameAndPasswordDto> responseEntity = traineeController.registerTrainee(new CreateTraineeDto());
 
 		// Assert
-		verify(traineeFacade, times(1)).registerTraineeFacade(any(CreateTraineeDto.class));
+		verify(traineeFacade, times(1)).registerTrainee(any(CreateTraineeDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testRegisterTrainee_Exception() throws Exception {
 		// Arrange
-		when(traineeFacade.registerTraineeFacade(any(CreateTraineeDto.class))).thenThrow(new RuntimeException());
+		when(traineeFacade.registerTrainee(any(CreateTraineeDto.class))).thenThrow(new RuntimeException());
 
 		// Act
 		ResponseEntity<UsernameAndPasswordDto> responseEntity = traineeController.registerTrainee(new CreateTraineeDto());
 
 		// Assert
-		verify(traineeFacade, times(1)).registerTraineeFacade(any(CreateTraineeDto.class));
+		verify(traineeFacade, times(1)).registerTrainee(any(CreateTraineeDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 
 	@Test
 	void testUpdateTrainee_Success() throws Exception {
 		// Arrange
-		when(traineeFacade.updateTraineeFacade(any(UpdateTraineeDto.class))).thenReturn(new UpdateTraineeResponseDto());
+		when(traineeFacade.updateTrainee(any(UpdateTraineeDto.class))).thenReturn(new UpdateTraineeResponseDto());
 
 		// Act
 		ResponseEntity<UpdateTraineeResponseDto> responseEntity = traineeController.updateTrainee(new UpdateTraineeDto());
 
 		// Assert
-		verify(traineeFacade, times(1)).updateTraineeFacade(any(UpdateTraineeDto.class));
+		verify(traineeFacade, times(1)).updateTrainee(any(UpdateTraineeDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testUpdateTrainee_Exception() throws Exception {
 		// Arrange
-		when(traineeFacade.updateTraineeFacade(any(UpdateTraineeDto.class))).thenThrow(new RuntimeException());
+		when(traineeFacade.updateTrainee(any(UpdateTraineeDto.class))).thenThrow(new RuntimeException());
 
 		// Act
 		ResponseEntity<UpdateTraineeResponseDto> responseEntity = traineeController.updateTrainee(new UpdateTraineeDto());
 
 		// Assert
-		verify(traineeFacade, times(1)).updateTraineeFacade(any(UpdateTraineeDto.class));
+		verify(traineeFacade, times(1)).updateTrainee(any(UpdateTraineeDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 
 	@Test
 	void testGetTrainee_Success() throws Exception {
 		// Arrange
-		when(traineeFacade.getTraineeFacade(any(UsernameDto.class))).thenReturn(new GetTraineeDto());
+		when(traineeFacade.getTrainee(any(UsernameDto.class))).thenReturn(new GetTraineeDto());
 
 		// Act
 		ResponseEntity<GetTraineeDto> responseEntity = traineeController.getTrainee(new UsernameDto());
 
 		// Assert
-		verify(traineeFacade, times(1)).getTraineeFacade(any(UsernameDto.class));
+		verify(traineeFacade, times(1)).getTrainee(any(UsernameDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testGetTrainee_Exception() throws Exception {
 		// Arrange
-		when(traineeFacade.getTraineeFacade(any(UsernameDto.class))).thenThrow(new RuntimeException());
+		when(traineeFacade.getTrainee(any(UsernameDto.class))).thenThrow(new RuntimeException());
 
 		// Act
 		ResponseEntity<GetTraineeDto> responseEntity = traineeController.getTrainee(new UsernameDto());
 
 		// Assert
-		verify(traineeFacade, times(1)).getTraineeFacade(any(UsernameDto.class));
+		verify(traineeFacade, times(1)).getTrainee(any(UsernameDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 
 	@Test
 	void testDeleteTrainee_Success() throws Exception {
 		// Arrange
-		doNothing().when(traineeFacade).deleteTraineeFacade(any(UsernameDto.class));
+		doNothing().when(traineeFacade).deleteTrainee(any(UsernameDto.class));
 
 		// Act
 		ResponseEntity<HttpStatus> responseEntity = traineeController.deleteTrainee(new UsernameDto());
 
 		// Assert
-		verify(traineeFacade, times(1)).deleteTraineeFacade(any(UsernameDto.class));
+		verify(traineeFacade, times(1)).deleteTrainee(any(UsernameDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testDeleteTrainee_Exception() throws Exception {
 		// Arrange
-		doThrow(new RuntimeException()).when(traineeFacade).deleteTraineeFacade(any(UsernameDto.class));
+		doThrow(new RuntimeException()).when(traineeFacade).deleteTrainee(any(UsernameDto.class));
 
 		// Act
 		ResponseEntity<HttpStatus> responseEntity = traineeController.deleteTrainee(new UsernameDto());
 
 		// Assert
-		verify(traineeFacade, times(1)).deleteTraineeFacade(any(UsernameDto.class));
+		verify(traineeFacade, times(1)).deleteTrainee(any(UsernameDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 }

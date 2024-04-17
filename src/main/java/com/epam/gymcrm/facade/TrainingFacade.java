@@ -1,7 +1,7 @@
 package com.epam.gymcrm.facade;
 
 import com.epam.gymcrm.dto.AddTrainingDto;
-import com.epam.gymcrm.dto.TrainingMicroserviceDto;
+import com.epam.gymcrm.dto.TrainingDurationCountDto;
 import com.epam.gymcrm.entity.Trainee;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
@@ -37,9 +37,8 @@ public class TrainingFacade {
 	private final TraineeService traineeService;
 	private final TrainerService trainerService;
 	private final TrainingService trainingService;
-	private final CircuitBreakerRegistry circuitBreakerRegistry;
-	private final RestTemplate restTemplate;
-	public void addTrainingFacade(AddTrainingDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException, ParseException {
+
+	public void addTraining(AddTrainingDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException, ParseException {
 		try {
 			String traineeUsername = request.getTraineeUsername();
 			String trainerUsername = request.getTrainerUsername();
@@ -72,56 +71,6 @@ public class TrainingFacade {
 		} catch (Exception e) {
 			log.error("Facade: Error while creating training: {}", e.getMessage());
 			throw e;
-		}
-	}
-
-	public TrainingMicroserviceDto createTrainingMicroserviceDto(AddTrainingDto request, String actionType) throws ParseException {
-		log.info("DTO creating started");
-		try {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			Date trainingDate = dateFormat.parse(request.getTrainingDate());
-			Trainer trainer = trainerService.getTrainerByUsername(request.getTrainerUsername());
-			return TrainingMicroserviceDto.builder()
-					.trainerUsername(trainer.getUser1().getUsername())
-					.trainerFirstName(trainer.getUser1().getFirstName())
-					.trainerLastName(trainer.getUser1().getLastName())
-					.isActive(trainer.getUser1().getIsActive())
-					.trainingDate(trainingDate)
-					.trainingDuration(Integer.valueOf(request.getTrainingDuration()))
-					.actionType(actionType)
-					.build();
-
-		} catch (Exception e) {
-			log.error("Facade: Error while creating TrainingMicroserviceDto: {}", e.getMessage());
-			throw e;
-		}
-	}
-
-	public void callMicroserviceFacade(TrainingMicroserviceDto trainingMicroserviceDto){
-		CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("trainingMicroserviceCallCircuitBreaker");
-		circuitBreaker.getEventPublisher()
-				.onError(event -> log.error("CircuitBreaker onError: {}", event.getThrowable().getMessage()))
-				.onStateTransition(event -> log.info("CircuitBreaker state transitioned: {}", event.getStateTransition()));
-
-		Callable<ResponseEntity> callable = () -> {
-			ResponseEntity response = restTemplate.postForEntity("http://localhost:9093/training/modifyWorkingTime", trainingMicroserviceDto, ResponseEntity.class);
-			if (response.getStatusCode() != HttpStatus.OK) {
-				throw new ResourceAccessException("Failed to call modifyWorkingTime");
-			}
-			return response;
-		};
-		Callable<ResponseEntity> decoratedCallable = CircuitBreaker.decorateCallable(circuitBreaker, callable);
-
-		for (int i = 0; i < 3; i++) {//3 attempts to call microservice
-			try {
-				decoratedCallable.call();
-				break;
-			} catch (Exception e) {
-				if (i == 2) {
-					throw new RuntimeException("Failed to call modifyWorkingTime", e);
-				}
-				log.error("Attempt {} to call modifyWorkingTime failed", i + 1, e);
-			}
 		}
 	}
 

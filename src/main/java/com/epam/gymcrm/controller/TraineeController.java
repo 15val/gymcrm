@@ -6,7 +6,7 @@ import com.epam.gymcrm.dto.GetTraineeDto;
 import com.epam.gymcrm.dto.GetTraineesTrainingListRequestDto;
 import com.epam.gymcrm.dto.GetTrainerListDto;
 import com.epam.gymcrm.dto.GetTrainingListDto;
-import com.epam.gymcrm.dto.TrainingMicroserviceDto;
+import com.epam.gymcrm.dto.TrainingDurationCountDto;
 import com.epam.gymcrm.dto.UpdateTraineeDto;
 import com.epam.gymcrm.dto.UpdateTraineeResponseDto;
 import com.epam.gymcrm.dto.UpdateTraineesTrainerListDto;
@@ -19,6 +19,7 @@ import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.facade.TraineeFacade;
 import com.epam.gymcrm.facade.TrainingFacade;
 import com.epam.gymcrm.service.TraineeService;
+import com.epam.gymcrm.service.TrainingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -43,13 +43,14 @@ public class TraineeController {
 
 	private final TraineeFacade traineeFacade;
 	private final TraineeService traineeService;
+	private final TrainingService trainingService;
 	private final TrainingFacade trainingFacade;
-
+	private static final String ACTION_TYPE_DELETE = "DELETE";
 
 	@PostMapping("/register")
 	public ResponseEntity<UsernameAndPasswordDto> registerTrainee(@RequestBody CreateTraineeDto request) {
 		try {
-			UsernameAndPasswordDto response = traineeFacade.registerTraineeFacade(request);
+			UsernameAndPasswordDto response = traineeFacade.registerTrainee(request);
 			log.info("Trainee successfully registered");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
@@ -61,7 +62,7 @@ public class TraineeController {
 	@PutMapping("/update")
 	public ResponseEntity<UpdateTraineeResponseDto> updateTrainee(@RequestBody UpdateTraineeDto request) {
 		try{
-			UpdateTraineeResponseDto response = traineeFacade.updateTraineeFacade(request);
+			UpdateTraineeResponseDto response = traineeFacade.updateTrainee(request);
 			log.info("Trainee successfully updated " + response.toString());
 			return ResponseEntity.ok(response);
 		}
@@ -74,7 +75,7 @@ public class TraineeController {
 	@PutMapping("/updateTrainersList")
 	public ResponseEntity<UpdateTraineesTrainerListResponseDto> updateTraineesTrainerList(@RequestBody UpdateTraineesTrainerListDto request) {
 		try{
-			UpdateTraineesTrainerListResponseDto response = traineeFacade.updateTraineesTrainerListFacade(request);
+			UpdateTraineesTrainerListResponseDto response = traineeFacade.updateTraineesTrainerList(request);
 			log.info("Trainee's trainer list successfully updated");
 			return ResponseEntity.ok(response);
 		}
@@ -87,7 +88,7 @@ public class TraineeController {
 	@GetMapping("/get")
 	public ResponseEntity<GetTraineeDto> getTrainee(@RequestBody UsernameDto request){
 		try {
-			GetTraineeDto response = traineeFacade.getTraineeFacade(request);
+			GetTraineeDto response = traineeFacade.getTrainee(request);
 			log.info("Trainee successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
@@ -111,11 +112,11 @@ public class TraineeController {
 							.trainingDuration(String.valueOf(training.getTrainingDuration()))
 							.trainingName(training.getTrainingName())
 							.build();
-					TrainingMicroserviceDto trainingMicroserviceDto = trainingFacade.createTrainingMicroserviceDto(addTrainingDto, "DELETE");
-					trainingFacade.callMicroserviceFacade(trainingMicroserviceDto);
+					TrainingDurationCountDto trainingMicroserviceDto = trainingService.createTrainingMicroserviceDto(addTrainingDto, ACTION_TYPE_DELETE);
+					trainingService.callTrainingDurationMicroservice(trainingMicroserviceDto);
 				}
 			}
-			traineeFacade.deleteTraineeFacade(request);
+			traineeFacade.deleteTrainee(request);
 			log.info("Trainee successfully deleted");
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
@@ -139,7 +140,7 @@ public class TraineeController {
 	@GetMapping("/getUnassignedTrainers")
 	public ResponseEntity<GetTrainerListDto> getUnassignedTrainers(@RequestBody UsernameDto request) {
 		try {
-			GetTrainerListDto response = traineeFacade.getUnassignedTrainersFacade(request);
+			GetTrainerListDto response = traineeFacade.getUnassignedTrainers(request);
 			log.info("Unassigned trainers successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
@@ -151,7 +152,7 @@ public class TraineeController {
 	@GetMapping("/getTrainingList")
 	public ResponseEntity<GetTrainingListDto> getTraineesTrainingList (@RequestBody GetTraineesTrainingListRequestDto request){
 		try {
-			GetTrainingListDto response = traineeFacade.getTraineesTrainingListFacade(request);
+			GetTrainingListDto response = traineeFacade.getTraineesTrainingList(request);
 			log.info("Trainee's list of trainings successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {

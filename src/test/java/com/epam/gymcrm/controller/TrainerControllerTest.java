@@ -44,78 +44,78 @@ class TrainerControllerTest {
 	@Test
 	void testRegisterTrainer_Success() throws Exception {
 		// Arrange
-		when(trainerFacade.registerTrainerFacade(any(CreateTrainerDto.class))).thenReturn(new UsernameAndPasswordDto());
+		when(trainerFacade.registerTrainer(any(CreateTrainerDto.class))).thenReturn(new UsernameAndPasswordDto());
 
 		// Act
 		ResponseEntity<UsernameAndPasswordDto> responseEntity = trainerController.registerTrainer(new CreateTrainerDto());
 
 		// Assert
-		verify(trainerFacade, times(1)).registerTrainerFacade(any(CreateTrainerDto.class));
+		verify(trainerFacade, times(1)).registerTrainer(any(CreateTrainerDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testRegisterTrainer_Exception() throws Exception {
 		// Arrange
-		when(trainerFacade.registerTrainerFacade(any(CreateTrainerDto.class))).thenThrow(new RuntimeException());
+		when(trainerFacade.registerTrainer(any(CreateTrainerDto.class))).thenThrow(new RuntimeException());
 
 		// Act
 		ResponseEntity<UsernameAndPasswordDto> responseEntity = trainerController.registerTrainer(new CreateTrainerDto());
 
 		// Assert
-		verify(trainerFacade, times(1)).registerTrainerFacade(any(CreateTrainerDto.class));
+		verify(trainerFacade, times(1)).registerTrainer(any(CreateTrainerDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 
 	@Test
 	void testUpdateTrainer_Success() throws Exception {
 		// Arrange
-		when(trainerFacade.updateTrainerFacade(any(UpdateTrainerDto.class))).thenReturn(new UpdateTrainerResponseDto());
+		when(trainerFacade.updateTrainer(any(UpdateTrainerDto.class))).thenReturn(new UpdateTrainerResponseDto());
 
 		// Act
 		ResponseEntity<UpdateTrainerResponseDto> responseEntity = trainerController.updateTrainer(new UpdateTrainerDto());
 
 		// Assert
-		verify(trainerFacade, times(1)).updateTrainerFacade(any(UpdateTrainerDto.class));
+		verify(trainerFacade, times(1)).updateTrainer(any(UpdateTrainerDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testUpdateTrainer_Exception() throws Exception {
 		// Arrange
-		when(trainerFacade.updateTrainerFacade(any(UpdateTrainerDto.class))).thenThrow(new RuntimeException());
+		when(trainerFacade.updateTrainer(any(UpdateTrainerDto.class))).thenThrow(new RuntimeException());
 
 		// Act
 		ResponseEntity<UpdateTrainerResponseDto> responseEntity = trainerController.updateTrainer(new UpdateTrainerDto());
 
 		// Assert
-		verify(trainerFacade, times(1)).updateTrainerFacade(any(UpdateTrainerDto.class));
+		verify(trainerFacade, times(1)).updateTrainer(any(UpdateTrainerDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 
 	@Test
 	void testGetTrainer_Success() throws Exception {
 		// Arrange
-		when(trainerFacade.getTrainerFacade(any(UsernameDto.class))).thenReturn(new GetTrainerDto());
+		when(trainerFacade.getTrainer(any(UsernameDto.class))).thenReturn(new GetTrainerDto());
 
 		// Act
 		ResponseEntity<GetTrainerDto> responseEntity = trainerController.getTrainer(new UsernameDto());
 
 		// Assert
-		verify(trainerFacade, times(1)).getTrainerFacade(any(UsernameDto.class));
+		verify(trainerFacade, times(1)).getTrainer(any(UsernameDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testGetTrainer_Exception() throws Exception {
 		// Arrange
-		when(trainerFacade.getTrainerFacade(any(UsernameDto.class))).thenThrow(new RuntimeException());
+		when(trainerFacade.getTrainer(any(UsernameDto.class))).thenThrow(new RuntimeException());
 
 		// Act
 		ResponseEntity<GetTrainerDto> responseEntity = trainerController.getTrainer(new UsernameDto());
 
 		// Assert
-		verify(trainerFacade, times(1)).getTrainerFacade(any(UsernameDto.class));
+		verify(trainerFacade, times(1)).getTrainer(any(UsernameDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 
@@ -148,26 +148,26 @@ class TrainerControllerTest {
 	@Test
 	void testGetTrainersTrainingList_Success() throws Exception {
 		// Arrange
-		when(trainerFacade.getTrainersTrainingListFacade(any(GetTrainersTrainingListRequestDto.class))).thenReturn(new GetTrainingListDto());
+		when(trainerFacade.getTrainersTrainingList(any(GetTrainersTrainingListRequestDto.class))).thenReturn(new GetTrainingListDto());
 
 		// Act
 		ResponseEntity<GetTrainingListDto> responseEntity = trainerController.getTrainersTrainingList(new GetTrainersTrainingListRequestDto());
 
 		// Assert
-		verify(trainerFacade, times(1)).getTrainersTrainingListFacade(any(GetTrainersTrainingListRequestDto.class));
+		verify(trainerFacade, times(1)).getTrainersTrainingList(any(GetTrainersTrainingListRequestDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testGetTrainersTrainingList_Exception() throws Exception {
 		// Arrange
-		when(trainerFacade.getTrainersTrainingListFacade(any(GetTrainersTrainingListRequestDto.class))).thenThrow(new RuntimeException());
+		when(trainerFacade.getTrainersTrainingList(any(GetTrainersTrainingListRequestDto.class))).thenThrow(new RuntimeException());
 
 		// Act
 		ResponseEntity<GetTrainingListDto> responseEntity = trainerController.getTrainersTrainingList(new GetTrainersTrainingListRequestDto());
 
 		// Assert
-		verify(trainerFacade, times(1)).getTrainersTrainingListFacade(any(GetTrainersTrainingListRequestDto.class));
+		verify(trainerFacade, times(1)).getTrainersTrainingList(any(GetTrainersTrainingListRequestDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 }

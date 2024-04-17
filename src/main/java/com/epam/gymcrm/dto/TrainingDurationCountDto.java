@@ -13,7 +13,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-public class TrainingMicroserviceDto {
+public class TrainingDurationCountDto {
 
 	@NotNull
 	private String trainerUsername;

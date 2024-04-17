@@ -35,7 +35,7 @@ public class TrainingTypeController {
 	@GetMapping("/get")
 	public ResponseEntity<GetTrainingTypeListDto> getTrainingTypeList() {
 		try {
-			GetTrainingTypeListDto response = trainingTypeFacade.getTrainingTypeListFacade();
+			GetTrainingTypeListDto response = trainingTypeFacade.getTrainingTypeList();
 			counter.inc();
 			gauge.set(response.getTrainingTypeList().size());
 			log.info("Training type list successfully retrieved");

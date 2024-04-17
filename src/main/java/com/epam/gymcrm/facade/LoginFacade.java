@@ -1,7 +1,6 @@
 package com.epam.gymcrm.facade;
 
 import com.epam.gymcrm.dto.UpdatePasswordDto;
-import com.epam.gymcrm.dto.UsernameAndPasswordDto;
 import com.epam.gymcrm.entity.User;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
@@ -27,7 +26,7 @@ public class LoginFacade {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	@Transactional
-	public void updatePasswordFacade(UpdatePasswordDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException {
+	public void updatePassword(UpdatePasswordDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			String password = passwordEncoder.encode(request.getPassword());

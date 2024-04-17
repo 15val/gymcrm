@@ -1,16 +1,31 @@
 package com.epam.gymcrm.service;
 
+import com.epam.gymcrm.dto.AddTrainingDto;
+import com.epam.gymcrm.dto.TrainingDurationCountDto;
+import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
+
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +40,15 @@ public class TrainingService {
 	private final UserRepository userRepository;
 	@Autowired
 	private final UserService userService;
+	@Autowired
+	private final RestTemplate restTemplate;
+	@Autowired
+	private final TrainerService trainerService;
 
 	@Transactional
 	public Long createTraining(Training training) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
-			if(userService.isUsernameAndPasswordValid(training.getTrainee1().getUser().getId()) && userService.isUsernameAndPasswordValid(training.getTrainer1().getUser1().getId())) {
+			if (userService.isUsernameAndPasswordValid(training.getTrainee1().getUser().getId()) && userService.isUsernameAndPasswordValid(training.getTrainer1().getUser1().getId())) {
 				if (userRepository.findById(training.getTrainee1().getUser().getId()).orElse(null) == null || userRepository.findById(training.getTrainer1().getUser1().getId()).orElse(null) == null) {
 					throw new UserNotFoundException("User was not found");
 				} else if (trainingTypeRepository.findById(training.getTrainingType1().getId()).orElse(null) == null) {
@@ -37,12 +56,10 @@ public class TrainingService {
 				}
 				trainingRepository.save(training);
 				return training.getId();
-			}
-			else {
+			} else {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Error while creating training: {}", e.getMessage());
 			throw e;
 		}
@@ -52,17 +69,49 @@ public class TrainingService {
 	public Training getTrainingById(Long trainingId) throws UserNotFoundException {
 		try {
 			Training training = trainingRepository.findById(trainingId).orElse(null);
-			if(training == null){
+			if (training == null) {
 				throw new UserNotFoundException("Training was not found");
-			}
-			else {
+			} else {
 				return training;
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Error while retrieving training: {}", e.getMessage());
 			throw e;
 		}
 	}
 
+	public TrainingDurationCountDto createTrainingMicroserviceDto(AddTrainingDto request, String actionType) throws ParseException {
+		try {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Date trainingDate = dateFormat.parse(request.getTrainingDate());
+			Trainer trainer = trainerService.getTrainerByUsername(request.getTrainerUsername());
+			return TrainingDurationCountDto.builder()
+					.trainerUsername(trainer.getUser1().getUsername())
+					.trainerFirstName(trainer.getUser1().getFirstName())
+					.trainerLastName(trainer.getUser1().getLastName())
+					.isActive(trainer.getUser1().getIsActive())
+					.trainingDate(trainingDate)
+					.trainingDuration(Integer.valueOf(request.getTrainingDuration()))
+					.actionType(actionType)
+					.build();
+
+		} catch (Exception e) {
+			log.error("Facade: Error while creating TrainingMicroserviceDto: {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	@CircuitBreaker(name = "trainingDurationMicroserviceCallCircuitBreaker", fallbackMethod = "fallbackForCallTrainingDurationMicroservice")
+	@Retry(name = "retryTrainingDurationMicroserviceCall", fallbackMethod = "fallbackForCallTrainingDurationMicroservice")
+	public void callTrainingDurationMicroservice(TrainingDurationCountDto trainingDurationCountDto) {
+		ResponseEntity<?> response = restTemplate.postForEntity("http://localhost:9093/training/modifyWorkingTime", trainingDurationCountDto, ResponseEntity.class);
+		if (response.getStatusCode() != HttpStatus.OK) {
+			throw new ResourceAccessException("Failed to reach /training/modifyWorkingTime endpoint");
+		}
+	}
+
+	public void fallbackForCallTrainingDurationMicroservice(TrainingDurationCountDto trainingDurationCountDto, ResourceAccessException ex) {
+		log.error("Fallback for callTrainingDurationMicroservice: {}", ex.getMessage());
+		throw ex;
+	}
 }

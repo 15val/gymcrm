@@ -33,6 +33,8 @@ public class AppConfig {
 	private UserService	userService;
 	private PasswordEncoder passwordEncoder;
 	private LoginAttemptService loginAttemptService;
+	private RestTemplate restTemplate;
+	private TrainerService trainerService;
 
 	@Bean
 	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
@@ -56,7 +58,7 @@ public class AppConfig {
 
 	@Bean
 	public TrainingService trainingService(){
-		return new TrainingService(trainingRepository, trainingTypeRepository, userRepository, userService);
+		return new TrainingService(trainingRepository, trainingTypeRepository, userRepository, userService, restTemplate, trainerService);
 	}
 
 	@Bean
