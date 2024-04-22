@@ -12,6 +12,7 @@ import com.epam.gymcrm.service.TrainerService;
 import com.epam.gymcrm.service.TrainingService;
 import com.epam.gymcrm.service.TrainingTypeService;
 import com.epam.gymcrm.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -35,6 +36,7 @@ public class AppConfig {
 	private LoginAttemptService loginAttemptService;
 	private RestTemplate restTemplate;
 	private TrainerService trainerService;
+	private ObjectMapper objectMapper;
 
 	@Bean
 	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
@@ -58,7 +60,7 @@ public class AppConfig {
 
 	@Bean
 	public TrainingService trainingService(){
-		return new TrainingService(trainingRepository, trainingTypeRepository, userRepository, userService, restTemplate, trainerService);
+		return new TrainingService(trainingRepository, trainingTypeRepository, userRepository, userService, objectMapper, trainerService);
 	}
 
 	@Bean
@@ -74,5 +76,10 @@ public class AppConfig {
 	@Bean
 	public AppUserDetailsService appUserDetailsService(){
 		return new AppUserDetailsService(userRepository, loginAttemptService);
+	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
+		return new ObjectMapper();
 	}
 }
