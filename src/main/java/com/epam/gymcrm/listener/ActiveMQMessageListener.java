@@ -16,10 +16,19 @@ public class ActiveMQMessageListener {
 		if (message.startsWith("Error:")) {
 			log.error("Error from training duration microservice: {}", message);
 			throw new FailedToModifyTrainingDurationException("Failed to modify training duration: " + message);
-
 		} else if(message.startsWith("Success")) {
 			log.info("Success from training duration microservice");
 		}
+	}
+
+	@JmsListener(destination = "DLQ.trainingDurationQueue")
+	public void receiveDlqMessage(String message) {
+		log.error("DLQ.trainingDurationQueue received message: {}", message);
+	}
+
+	@JmsListener(destination = "DLQ.trainingDurationResponseQueue")
+	public void receiveResponseDlqMessage(String message) {
+		log.error("DLQ.trainingDurationResponseQueue received message: {}", message);
 	}
 
 }
