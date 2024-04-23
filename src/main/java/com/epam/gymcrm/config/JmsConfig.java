@@ -5,7 +5,6 @@ import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.region.policy.IndividualDeadLetterStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
-import org.apache.activemq.network.NetworkConnector;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
@@ -15,9 +14,7 @@ public class JmsConfig {
 
 	@Bean
 	public ActiveMQConnectionFactory connectionFactory(){
-		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-		connectionFactory.setBrokerURL("tcp://localhost:61616");
-		return connectionFactory;
+		return new ActiveMQConnectionFactory("tcp://localhost:61616");
 	}
 
 	@Bean

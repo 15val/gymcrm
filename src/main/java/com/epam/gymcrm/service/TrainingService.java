@@ -116,8 +116,4 @@ public class TrainingService {
 
 	}
 
-	public void fallbackForCallTrainingDurationMicroservice(TrainingDurationCountDto trainingDurationCountDto, ResourceAccessException ex) {
-		log.error("Fallback for callTrainingDurationMicroservice: {}", ex.getMessage());
-		throw ex;
-	}
 }
