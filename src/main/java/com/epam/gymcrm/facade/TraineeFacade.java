@@ -46,7 +46,7 @@ public class TraineeFacade {
 	private final TrainerService trainerService;
 
 	@Transactional
-	public UsernameAndPasswordDto registerTraineeFacade(CreateTraineeDto request) throws UserNotFoundException, ParseException, UsernameOrPasswordInvalidException {
+	public UsernameAndPasswordDto registerTrainee(CreateTraineeDto request) throws UserNotFoundException, ParseException, UsernameOrPasswordInvalidException {
 		try {
 			String firstName = request.getFirstName();
 			String lastName = request.getLastName();
@@ -70,7 +70,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public UpdateTraineeResponseDto updateTraineeFacade(UpdateTraineeDto request) throws ParseException, UsernameOrPasswordInvalidException {
+	public UpdateTraineeResponseDto updateTrainee(UpdateTraineeDto request) throws ParseException, UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			String firstName = request.getFirstName();
@@ -117,7 +117,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public UpdateTraineesTrainerListResponseDto updateTraineesTrainerListFacade(UpdateTraineesTrainerListDto request) throws UsernameOrPasswordInvalidException {
+	public UpdateTraineesTrainerListResponseDto updateTraineesTrainerList(UpdateTraineesTrainerListDto request) throws UsernameOrPasswordInvalidException {
 		try {
 			String traineeUsername = request.getTraineeUsername();
 			Trainee trainee = traineeService.getTraineeByUsername(traineeUsername);
@@ -152,7 +152,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public GetTraineeDto getTraineeFacade(UsernameDto request) throws UsernameOrPasswordInvalidException {
+	public GetTraineeDto getTrainee(UsernameDto request) throws UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			Trainee trainee = traineeService.getTraineeByUsername(username);
@@ -179,7 +179,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public void deleteTraineeFacade(UsernameDto request) throws UsernameOrPasswordInvalidException, UserNotFoundException {
+	public void deleteTrainee(UsernameDto request) throws UsernameOrPasswordInvalidException, UserNotFoundException {
 		try {
 			String username = request.getUsername();
 			traineeService.deleteTraineeByUsername(username);
@@ -202,7 +202,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public GetTrainerListDto getUnassignedTrainersFacade(UsernameDto request) throws UserNotFoundException {
+	public GetTrainerListDto getUnassignedTrainers(UsernameDto request) throws UserNotFoundException {
 		try {
 			String username = request.getUsername();
 			List<Trainer> trainerList = traineeService.getUnassignedTrainersByTraineeUsername(username);
@@ -227,7 +227,7 @@ public class TraineeFacade {
 	}
 
 	@Transactional
-	public GetTrainingListDto getTraineesTrainingListFacade(GetTraineesTrainingListRequestDto request) throws UserNotFoundException, ParseException {
+	public GetTrainingListDto getTraineesTrainingList(GetTraineesTrainingListRequestDto request) throws UserNotFoundException, ParseException {
 		try {
 			String traineeUsername = request.getTraineeUsername();
 			String trainingTypeName = request.getTrainingTypeName();

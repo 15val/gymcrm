@@ -34,26 +34,26 @@ class TrainingControllerTest {
 	@Test
 	void testAddTraining_Success() throws Exception {
 		// Arrange
-		doNothing().when(trainingFacade).addTrainingFacade(any(AddTrainingDto.class));
+		doNothing().when(trainingFacade).addTraining(any(AddTrainingDto.class));
 
 		// Act
 		ResponseEntity<HttpStatus> responseEntity = trainingController.addTraining(new AddTrainingDto());
 
 		// Assert
-		verify(trainingFacade, times(1)).addTrainingFacade(any(AddTrainingDto.class));
+		verify(trainingFacade, times(1)).addTraining(any(AddTrainingDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
 	}
 
 	@Test
 	void testAddTraining_Exception() throws Exception {
 		// Arrange
-		doThrow(new RuntimeException()).when(trainingFacade).addTrainingFacade(any(AddTrainingDto.class));
+		doThrow(new RuntimeException()).when(trainingFacade).addTraining(any(AddTrainingDto.class));
 
 		// Act
 		ResponseEntity<HttpStatus> responseEntity = trainingController.addTraining(new AddTrainingDto());
 
 		// Assert
-		verify(trainingFacade, times(1)).addTrainingFacade(any(AddTrainingDto.class));
+		verify(trainingFacade, times(1)).addTraining(any(AddTrainingDto.class));
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 

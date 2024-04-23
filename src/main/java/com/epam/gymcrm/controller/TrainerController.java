@@ -1,8 +1,6 @@
 package com.epam.gymcrm.controller;
 
 import com.epam.gymcrm.dto.CreateTrainerDto;
-import com.epam.gymcrm.dto.GetTraineeDto;
-import com.epam.gymcrm.dto.GetTraineesTrainingListRequestDto;
 import com.epam.gymcrm.dto.GetTrainerDto;
 import com.epam.gymcrm.dto.GetTrainersTrainingListRequestDto;
 import com.epam.gymcrm.dto.GetTrainingListDto;
@@ -35,7 +33,7 @@ public class TrainerController {
 	@PostMapping("/register")
 	public ResponseEntity<UsernameAndPasswordDto> registerTrainer(@RequestBody CreateTrainerDto request) {
 		try {
-			UsernameAndPasswordDto response = trainerFacade.registerTrainerFacade(request);
+			UsernameAndPasswordDto response = trainerFacade.registerTrainer(request);
 			log.info("Trainer successfully registered");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
@@ -48,7 +46,7 @@ public class TrainerController {
 	@PutMapping("/update")
 	public ResponseEntity<UpdateTrainerResponseDto> updateTrainer(@RequestBody UpdateTrainerDto request) {
 		try{
-			UpdateTrainerResponseDto response = trainerFacade.updateTrainerFacade(request);
+			UpdateTrainerResponseDto response = trainerFacade.updateTrainer(request);
 			log.info("Trainer successfully updated");
 			return ResponseEntity.ok(response);
 		}
@@ -61,7 +59,7 @@ public class TrainerController {
 	@GetMapping("/get")
 	public ResponseEntity<GetTrainerDto> getTrainer(@RequestBody UsernameDto request){
 		try {
-			GetTrainerDto response = trainerFacade.getTrainerFacade(request);
+			GetTrainerDto response = trainerFacade.getTrainer(request);
 			log.info("Trainer successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
@@ -85,7 +83,7 @@ public class TrainerController {
 	@GetMapping("/getTrainingList")
 	public ResponseEntity<GetTrainingListDto> getTrainersTrainingList (@RequestBody GetTrainersTrainingListRequestDto request){
 		try {
-			GetTrainingListDto response = trainerFacade.getTrainersTrainingListFacade(request);
+			GetTrainingListDto response = trainerFacade.getTrainersTrainingList(request);
 			log.info("Trainer's list of trainings successfully retrieved");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {

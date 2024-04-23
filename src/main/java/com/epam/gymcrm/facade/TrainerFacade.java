@@ -1,8 +1,6 @@
 package com.epam.gymcrm.facade;
 
 import com.epam.gymcrm.dto.CreateTrainerDto;
-import com.epam.gymcrm.dto.GetTraineeDto;
-import com.epam.gymcrm.dto.GetTraineesTrainingListRequestDto;
 import com.epam.gymcrm.dto.GetTrainerDto;
 import com.epam.gymcrm.dto.GetTrainersTrainingListRequestDto;
 import com.epam.gymcrm.dto.GetTrainingListDto;
@@ -45,7 +43,7 @@ public class TrainerFacade {
 	private final TrainingTypeService trainingTypeService;
 
 	@Transactional
-	public UsernameAndPasswordDto registerTrainerFacade(CreateTrainerDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException {
+	public UsernameAndPasswordDto registerTrainer(CreateTrainerDto request) throws UserNotFoundException, UsernameOrPasswordInvalidException {
 		try {
 			String firstName = request.getFirstName();
 			String lastName = request.getLastName();
@@ -66,13 +64,12 @@ public class TrainerFacade {
 	}
 
 	@Transactional
-	public UpdateTrainerResponseDto updateTrainerFacade(UpdateTrainerDto request) throws UsernameOrPasswordInvalidException {
+	public UpdateTrainerResponseDto updateTrainer(UpdateTrainerDto request) throws UsernameOrPasswordInvalidException {
 		try {
 			String username = request.getUsername();
 			String firstName = request.getFirstName();
 			String lastName = request.getLastName();
 			boolean isActive = Boolean.parseBoolean(request.getIsActive());
-			//Long specialization = Long.valueOf(request.getSpecialization());   READ ONLY???
 			Trainer trainer = trainerService.getTrainerByUsername(username);
 			User user = trainer.getUser1();
 			user.setFirstName(firstName);
@@ -103,7 +100,7 @@ public class TrainerFacade {
 	}
 
 	@Transactional
-	public GetTrainerDto getTrainerFacade(UsernameDto request) {
+	public GetTrainerDto getTrainer(UsernameDto request) {
 		try {
 			String username = request.getUsername();
 			Trainer trainer = trainerService.getTrainerByUsername(username);
@@ -140,7 +137,7 @@ public class TrainerFacade {
 	}
 
 	@Transactional
-	public GetTrainingListDto getTrainersTrainingListFacade(GetTrainersTrainingListRequestDto request) throws UserNotFoundException, ParseException {
+	public GetTrainingListDto getTrainersTrainingList(GetTrainersTrainingListRequestDto request) throws UserNotFoundException, ParseException {
 		try {
 			String traineeUsername = request.getTraineeUsername();
 			String trainerUsername = request.getTrainerUsername();

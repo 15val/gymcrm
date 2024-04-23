@@ -1,15 +1,11 @@
 package com.epam.gymcrm.facade;
 
 import com.epam.gymcrm.dto.GetTrainingTypeListDto;
-import com.epam.gymcrm.dto.TrainerDto;
 import com.epam.gymcrm.dto.TrainingTypeDto;
-import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.TrainingType;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
-import com.epam.gymcrm.service.TrainingTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +20,7 @@ public class TrainingTypeFacade {
 
 	private final TrainingTypeRepository trainingTypeRepository;
 
-	public GetTrainingTypeListDto getTrainingTypeListFacade(){
+	public GetTrainingTypeListDto getTrainingTypeList(){
 		try {
 			List<TrainingType> trainingTypeList = trainingTypeRepository.findAll();
 			List<TrainingTypeDto> trainingTypeDtoList = new ArrayList<>();

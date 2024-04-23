@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @ComponentScan(basePackages = "com.epam.gymcrm")
@@ -32,6 +33,8 @@ public class AppConfig {
 	private UserService	userService;
 	private PasswordEncoder passwordEncoder;
 	private LoginAttemptService loginAttemptService;
+	private RestTemplate restTemplate;
+	private TrainerService trainerService;
 
 	@Bean
 	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
@@ -39,8 +42,13 @@ public class AppConfig {
 	}
 
 	@Bean
+	public RestTemplate restTemplate(){
+		return new RestTemplate();
+	}
+
+	@Bean
 	public TraineeService traineeService(){
-		return new TraineeService(traineeRepository, userRepository, userService, trainerRepository);
+		return new TraineeService(traineeRepository, userRepository, userService, trainerRepository, trainingRepository);
 	}
 
 	@Bean
@@ -50,7 +58,7 @@ public class AppConfig {
 
 	@Bean
 	public TrainingService trainingService(){
-		return new TrainingService(trainingRepository, trainingTypeRepository, userRepository, userService);
+		return new TrainingService(trainingRepository, trainingTypeRepository, userRepository, userService, restTemplate, trainerService);
 	}
 
 	@Bean

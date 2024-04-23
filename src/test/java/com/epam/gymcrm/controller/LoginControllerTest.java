@@ -66,13 +66,13 @@ class LoginControllerTest {
 	@Test
 	void testUpdatePassword_Success() throws Exception {
 		// Підготовка моків та поведінки
-		doNothing().when(loginFacade).updatePasswordFacade(any(UpdatePasswordDto.class));
+		doNothing().when(loginFacade).updatePassword(any(UpdatePasswordDto.class));
 
 		// Викликаємо метод контролера
 		ResponseEntity<HttpStatus> responseEntity = loginController.updatePassword(new UpdatePasswordDto());
 
 		// Перевіряємо, що метод loginFacade.updatePasswordFacade() був викликаний один раз
-		verify(loginFacade, times(1)).updatePasswordFacade(any(UpdatePasswordDto.class));
+		verify(loginFacade, times(1)).updatePassword(any(UpdatePasswordDto.class));
 
 		// Перевіряємо статус відповіді
 		assert responseEntity.getStatusCode() == HttpStatus.OK;
@@ -81,13 +81,13 @@ class LoginControllerTest {
 	@Test
 	void testUpdatePassword_Error() throws Exception {
 		// Підготовка моків та поведінки для симуляції помилки
-		doThrow(UserNotFoundException.class).when(loginFacade).updatePasswordFacade(any(UpdatePasswordDto.class));
+		doThrow(UserNotFoundException.class).when(loginFacade).updatePassword(any(UpdatePasswordDto.class));
 
 		// Викликаємо метод контролера
 		ResponseEntity<HttpStatus> responseEntity = loginController.updatePassword(new UpdatePasswordDto());
 
 		// Перевіряємо, що метод loginFacade.updatePasswordFacade() був викликаний один раз
-		verify(loginFacade, times(1)).updatePasswordFacade(any(UpdatePasswordDto.class));
+		verify(loginFacade, times(1)).updatePassword(any(UpdatePasswordDto.class));
 
 		// Перевіряємо статус відповіді
 		assert responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;

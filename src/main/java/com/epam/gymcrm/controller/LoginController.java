@@ -46,7 +46,7 @@ public class LoginController {
 	@PutMapping("/updatePassword")
 	ResponseEntity<HttpStatus> updatePassword(@RequestBody UpdatePasswordDto request){
 		try {
-			loginFacade.updatePasswordFacade(request);
+			loginFacade.updatePassword(request);
 			log.info("Password updated successfully: New password is: " + request.getNewPassword());
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {

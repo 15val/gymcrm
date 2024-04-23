@@ -8,6 +8,7 @@ import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TraineeRepository;
 import com.epam.gymcrm.repository.TrainerRepository;
+import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,8 @@ public class TraineeService {
 	private final UserService userService;
 	@Autowired
 	private final TrainerRepository trainerRepository;
+	@Autowired
+	private final TrainingRepository trainingRepository;
 
 
 	@Transactional
@@ -171,7 +174,12 @@ public class TraineeService {
 	public void deleteTraineeByUsername(String username) throws UsernameOrPasswordInvalidException, UserNotFoundException {
 		try {
 			if (userService.isUsernameAndPasswordValid(getTraineeByUsername(username).getUser().getId())) {
-				deleteTrainee(getTraineeByUsername(username).getId());
+				Trainee trainee = getTraineeByUsername(username);
+				trainee.setTrainerList(null);
+				updateTrainee(trainee);
+				trainingRepository.deleteTrainingsByTrainee1(trainee);
+				deleteTrainee(trainee.getId());
+
 			} else {
 				throw new UsernameOrPasswordInvalidException("Username or password is invalid");
 			}
