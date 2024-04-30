@@ -15,12 +15,11 @@ public class ActiveMQMessageListener {
 	private static final String  HTTP_STATUS_INTERNAL_SERVER_ERROR = "500";
 
 	@JmsListener(destination = "trainingDurationResponseQueue")
-	public void receiveResponse(String message) throws FailedToModifyTrainingDurationException {
+	public void receiveResponse(String message) {
 		if (message.equals(HTTP_STATUS_OK)) {
 			log.info("Success from training duration microservice");
-			throw new FailedToModifyTrainingDurationException("Failed to modify training duration: " + message);
-		} else if(message.equals(HTTP_STATUS_INTERNAL_SERVER_ERROR)) {//change
-			log.error("Error from training duration microservice: {}", message);
+		} else if(message.equals(HTTP_STATUS_INTERNAL_SERVER_ERROR)) {
+			log.error("Error from training duration microservice, failed to modify training duration: {}", message);
 		}
 	}
 
