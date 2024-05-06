@@ -7,13 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-public class TrainingDurationCountDto {
+public class TrainingDurationCountDto implements Serializable {
 
 	@NotNull
 	private String trainerUsername;

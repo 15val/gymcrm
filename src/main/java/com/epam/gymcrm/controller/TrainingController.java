@@ -27,8 +27,8 @@ public class TrainingController {
 	public ResponseEntity<HttpStatus> addTraining(@RequestBody AddTrainingDto request) {
 		try {
 			TrainingDurationCountDto trainingMicroserviceDto = trainingService.createTrainingMicroserviceDto(request, ACTION_TYPE_ADD);
-			trainingService.callTrainingDurationMicroservice(trainingMicroserviceDto);
 			trainingFacade.addTraining(request);
+			trainingService.callTrainingDurationMicroservice(trainingMicroserviceDto);
 			log.info("Training successfully added");
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {

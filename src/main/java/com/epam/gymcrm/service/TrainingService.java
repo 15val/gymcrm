@@ -4,25 +4,26 @@ import com.epam.gymcrm.dto.AddTrainingDto;
 import com.epam.gymcrm.dto.TrainingDurationCountDto;
 import com.epam.gymcrm.entity.Trainer;
 import com.epam.gymcrm.entity.Training;
+import com.epam.gymcrm.exception.FailedToModifyTrainingDurationException;
 import com.epam.gymcrm.exception.UserNotFoundException;
 import com.epam.gymcrm.exception.UsernameOrPasswordInvalidException;
 import com.epam.gymcrm.repository.TrainingRepository;
 import com.epam.gymcrm.repository.TrainingTypeRepository;
 import com.epam.gymcrm.repository.UserRepository;
-
-import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,9 +42,11 @@ public class TrainingService {
 	@Autowired
 	private final UserService userService;
 	@Autowired
-	private final RestTemplate restTemplate;
+	private final ObjectMapper objectMapper;
 	@Autowired
 	private final TrainerService trainerService;
+	@Autowired
+	private JmsTemplate jmsTemplate;
 
 	@Transactional
 	public Long createTraining(Training training) throws UserNotFoundException, UsernameOrPasswordInvalidException {
@@ -96,22 +99,21 @@ public class TrainingService {
 					.build();
 
 		} catch (Exception e) {
-			log.error("Facade: Error while creating TrainingMicroserviceDto: {}", e.getMessage());
+			log.error("Error while creating TrainingMicroserviceDto: {}", e.getMessage());
 			throw e;
 		}
 	}
 
-	@CircuitBreaker(name = "trainingDurationMicroserviceCallCircuitBreaker", fallbackMethod = "fallbackForCallTrainingDurationMicroservice")
-	@Retry(name = "retryTrainingDurationMicroserviceCall", fallbackMethod = "fallbackForCallTrainingDurationMicroservice")
-	public void callTrainingDurationMicroservice(TrainingDurationCountDto trainingDurationCountDto) {
-		ResponseEntity<?> response = restTemplate.postForEntity("http://localhost:9093/training/modifyWorkingTime", trainingDurationCountDto, ResponseEntity.class);
-		if (response.getStatusCode() != HttpStatus.OK) {
-			throw new ResourceAccessException("Failed to reach /training/modifyWorkingTime endpoint");
+	public void callTrainingDurationMicroservice(TrainingDurationCountDto trainingDurationCountDto) throws FailedToModifyTrainingDurationException, JsonProcessingException {
+		try {
+			String json = objectMapper.writeValueAsString(trainingDurationCountDto);
+			jmsTemplate.convertAndSend("trainingDurationQueue", json);
 		}
+		catch (Exception e) {
+			log.error("Error while calling Training Duration Microservice: {}", e.getMessage());
+			throw e;
+		}
+
 	}
 
-	public void fallbackForCallTrainingDurationMicroservice(TrainingDurationCountDto trainingDurationCountDto, ResourceAccessException ex) {
-		log.error("Fallback for callTrainingDurationMicroservice: {}", ex.getMessage());
-		throw ex;
-	}
 }
