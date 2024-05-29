@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 @AutoConfigureObservability
 @TestPropertySource(locations = "classpath:application.properties")
 class TrainingTypeServiceTest {
+
 	@Mock
 	private TrainingTypeRepository trainingTypeRepository;
 

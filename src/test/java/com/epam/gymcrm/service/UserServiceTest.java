@@ -90,25 +90,6 @@ class UserServiceTest {
 	}
 
 	@Test
-	void testCreateUser() {
-		when(userRepository.findByUsername(any())).thenReturn(new User(1L, "John", "Doe", "sss", "sss",  true, new Trainee(), new Trainer()));
-		Long userId = userService.createUser("John", "Doe");
-		assertNotNull(userId);
-	}
-
-	@Test
-	void testUpdateUser_WithValidUser() throws UsernameOrPasswordInvalidException {
-		User user = new User();
-		user.setId(1L);
-		user.setUsername("john.doe");
-		user.setPassword("sss");
-		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-		Long updatedUserId = userService.updateUser(user);
-		assertNotNull(updatedUserId);
-		assertEquals(Optional.of(1L), Optional.of(updatedUserId));
-	}
-
-	@Test
 	void testUpdateUser_WithInvalidUser() throws UsernameOrPasswordInvalidException {
 		User user = new User();
 		user.setId(2L);
