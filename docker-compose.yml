@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  gymcrm_postgres:
+    image: postgres
+    container_name: gymcrm_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: gymcrm
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  my-mongodb-container:
+    image: mongo
+    container_name: my-mongodb-container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  eureka-server:
+    image: ygqygq2/eureka-server:latest
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      SERVER_PORT: 8761
+      EUREKA_INSTANCE_HOSTNAME: eureka-server
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+      EUREKA_SERVER_ENABLE_SELF_PRESERVATION: "false"
+
+  gymcrm:
+    image: gymcrm:latest
+    container_name: gymcrm
+    depends_on:
+      - gymcrm_postgres
+      - eureka-server
+    ports:
+      - "5433:5433"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://gymcrm_postgres:5432/gymcrm
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_ACTIVEMQ_BROKER_URL: tcp://0.0.0.0:61616
+      SPRING_ACTIVEMQ_USER: admin
+      SPRING_ACTIVEMQ_PASSWORD: admin
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+  training-duration-microservice:
+    image: training-duration-microservice:latest
+    container_name: training-duration-microservice
+    depends_on:
+      - my-mongodb-container
+      - eureka-server
+    ports:
+      - "9093:9093"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://my-mongodb-container:27017/training-duration-microservice-db
+      SPRING_DATA_MONGODB_DATABASE: training-duration-microservice-db
+      SPRING_ACTIVEMQ_BROKER_URL: tcp://gymcrm:61616
+      SPRING_ACTIVEMQ_USER: admin
+      SPRING_ACTIVEMQ_PASSWORD: admin
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+volumes:
+  postgres_data:
+  mongo_data:

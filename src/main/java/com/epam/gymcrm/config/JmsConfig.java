@@ -8,13 +8,17 @@ import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 public class JmsConfig {
 
+	@Value("${spring.activemq.broker-url}")
+	private String brokerUrl;
+
 	@Bean
 	public ActiveMQConnectionFactory connectionFactory(){
-		return new ActiveMQConnectionFactory("tcp://localhost:61616");
+		return new ActiveMQConnectionFactory(brokerUrl);
 	}
 
 	@Bean
@@ -27,7 +31,7 @@ public class JmsConfig {
 	@Bean
 	public BrokerService broker() throws Exception {
 		BrokerService broker = new BrokerService();
-		broker.addConnector("tcp://localhost:61616");
+		broker.addConnector(brokerUrl);
 
 		IndividualDeadLetterStrategy deadLetterStrategy = new IndividualDeadLetterStrategy();
 		deadLetterStrategy.setQueuePrefix("DLQ.");
